@@ -2,9 +2,10 @@ if (!this.JistKit) {
 	this.JistKit = {}
 }
 
-this.JistKit.TouchTracker = function TouchTracker(target) {
+this.JistKit.TouchTracker = function TouchTracker(target,capture) {
 	this.target = target||this.target;
-	this.target.addEventListener("touchstart", this,true);
+	this.capture = capture == undefined ? this.capture : capture;
+	this.target.addEventListener("touchstart", this, this.capture);
 }
 this.JistKit.TouchTracker.prototype = {
 	cancelClickDistance: 80,
@@ -12,6 +13,7 @@ this.JistKit.TouchTracker.prototype = {
 	currentDistance: 0,
 	moving: false,
 	target: this,
+	capture: true,
 	debug: this.DEBUG ? function touchTracker_debug() {
 		var messages = [this];
 		messages.push.apply(messages,arguments);
