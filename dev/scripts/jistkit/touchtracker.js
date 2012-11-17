@@ -60,7 +60,6 @@ this.JistKit.TouchTracker.prototype = {
 		this.clicked = false;
 		this.touchStartEvent = touchStartEvent;
 		this.active = true;
-		this.debug("attached")
 	},
 	detachFromTarget: function touchTracker_detachFromTarget(touchEndEvent) {
 		this.target.removeEventListener("touchend", this);
@@ -113,16 +112,18 @@ this.JistKit.TouchTracker.prototype = {
 	dispatchBespokeTouchEnd: function touchTracker_dispatchBespokeTouchEnd(event) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("jistkit.touchtracker.touchend", true, true, window, event.detail, event.screenX, event.screenY, event.clientX, event.clientY, false, false, false, false, 0, null);
-		this.debug("dispatching custom touchend")
 		this.currentElement.dispatchEvent(evt);
 	},
 	dispatchTouchHold: function touchTracker_dispatchTouchHold (event) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("jistkit.touchtracker.touchhold", true, true, window, event.detail, event.screenX, event.screenY, event.clientX, event.clientY, false, false, false, false, 0, null);
-		this.debug("dispatching custom touchhold")
 		this.currentElement.dispatchEvent(evt);
 	},
 	destroy: function touchTracker_destroy() {
 		this.target.removeEventListener("touchstart", this);
+		this.target.addEventListener("touchend", this);
+		this.target.addEventListener("click", this);
+		this.target.addEventListener("touchmove", this);
+		//remove keys
 	}
 }
