@@ -1,5 +1,5 @@
 //TODO decide on precendence behaviour....
-
+//CHANGE TO PROXIMITY GAIN and PROXIMITY LOST like focus
 if (!this.JistKit) {
 	this.JistKit = {};
 }
