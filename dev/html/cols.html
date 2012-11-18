@@ -23,12 +23,93 @@
 				height: 300px;
 				overflow-x: auto;
 			}
+
+			@-webkit-keyframes trigger {
+			   0% { -webkit-transform: scale(1.0); }
+			   100%   { -webkit-transform: scale(1.0); }
+			}
+	 
+	/* This is the element that we apply the animation to. */
+	div.columned {
+	   -webkit-animation-name: trigger;
+	   -webkit-animation-duration: 0.00001s;
+	   -webkit-animation-timing-function: ease; /* ease is the default */
+	   -webkit-animation-delay: 0s;             /* 0 is the default */
+	   -webkit-animation-iteration-count: 1;    /* 1 is the default */
+	   -webkit-animation-direction: alternate;  /* normal is the default */
+	}
 			
 		</style>
+		<script>
+
+		var JistKit = {
+			instantiate: function JistKit_instantiate(Constructor,argumentArray) {
+				return Constructor.apply(
+					Object.create(Constructor.prototype),
+					argumentArray
+				);
+			},
+			ColumnScroll: function JistKit_ColumnScroll(element) {
+				this.element = element;
+				if (element) this.initialize();
+			}
+				
+		}
+		JistKit.ColumnScroll.prototype = {
+			initialize: function JistKit_ColumnScroll_initialize() {
+				this.element.style.overflow = 'hidden';
+				if (this.element.tabIndex=-1) {
+					this.element.tabIndex = "0";
+				}
+				this.element.addEventListener("keydown",this,true);
+			},
+			handleEvent: function (event) {
+				console.log(event)
+				switch (event.type) {
+					case "keydown": return this.move(event);
+				}
+			},
+			getColumnWidth: function () {
+				return this.element.clientWidth;
+				//return parseFloat(this.element.ownerDocument.defaultView.getComputedStyle(this.element,null).webkitColumnWidth);
+			},
+			move: function (event) {
+				console.log(event.keyCode)
+				if (event.keyCode == 37) return this.moveBackward(event)
+				if (event.keyCode == 39) return this.moveForward(event)
+			},
+			moveForward: function () {
+				var columnWidth = this.getColumnWidth(),
+					newScrollLeft = this.element.scrollLeft + columnWidth
+				if (newScrollLeft+columnWidth <= this.element.scrollWidth) {
+					this.element.scrollLeft += columnWidth;
+				}
+			},
+			moveBackward: function () {
+				var columnWidth = this.getColumnWidth();
+				this.element.scrollLeft -= columnWidth;
+			}
+
+		}
+
+		addEventListener("webkitAnimationEnd", function (event) {//TODO think about json.parse instead...
+			var types = eval('({'+event.target.getAttribute("data-jistkit")+'})');
+			for (var i=0, keys = Object.keys(types), l = keys.length, key, path, Constructor = JistKit;i!=l;i++) {
+				key = keys[i];
+				path = key.split('.');
+				for (var j=0;j<path.length;j++) {
+					Constructor = Constructor[path[j]];
+				}
+				types[key].unshift(event.target);
+				JistKit.instantiate(Constructor,types[key])
+			}
+		}
+		,true)
+		</script>
 	</head>
 	<body>
 		<section>
-		<div class="columned">
+		<div class="columned" data-jistkit="ColumnScroll: []">
 			<h1>Let's see what we can do with column css</h1>
 			<p>HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not allow children of the type of the newChild node, or if the node to put in is one of this node's ancestors or this node itself, or if this node is of type Document and the result of the replacement operation would add a second DocumentType or Element on the Document node.</p>
 
