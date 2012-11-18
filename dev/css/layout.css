@@ -1,0 +1,79 @@
+html,body {
+	margin:0;
+	padding:0;
+	overflow: hidden;
+}
+* {
+	outline: 1px dotted silver;
+}
+#primary-view {
+	position: absolute;
+	left: 0;
+	top: 0;
+	right: 0;
+	bottom: 0;
+}
+#primary-stats {
+	position: absolute;
+	left: 0;
+	bottom: 85%;
+	right: 0;
+	height: 100%;
+	overflow: visible;
+}
+#primary-dashboard {
+	position: absolute;
+	left: 0;
+	top: 85%;
+	right: 0;
+	height: 100%;
+	overflow: visible;
+}
+#primary-profile {
+	position: absolute;
+	right: 15%;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	overflow: visible;
+}
+#primary-contextual {
+	position: absolute;
+	left: 85%;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	overflow: visible;
+}
+#primary-navigation {
+	position: absolute;
+	left: 0;
+	top: 0;
+	height: 100%;
+	width: 100%;
+	display:none;
+	overflow: visible;
+}
+.contextual > nav {
+	position: absolute;
+	top: 0;
+	left: 0;
+	width: 15%;
+	bottom: 0;
+}
+.contextual ul {
+	margin: 0;
+	padding: 0;
+	list-style-type: none;
+	display: table;
+	min-width: 100%;
+	min-height: 100%;
+	height: 100%;
+}
+.contextual ul li {
+	display: table-row;
+}
+.contextual ul li a {
+	display: table-cell;
+}
+
