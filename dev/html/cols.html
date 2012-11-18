@@ -11,7 +11,7 @@
 				height: 100%;
 				padding: 0 0.4ex 0 0.5ex;
 				-webkit-column-gap: 1ex;
-				-webkit-column-rule: 1px outset #ff00ff;
+				overflow: hidden;
 			}
 
 			img {
@@ -57,14 +57,13 @@
 		}
 		JistKit.ColumnScroll.prototype = {
 			initialize: function JistKit_ColumnScroll_initialize() {
-				this.element.style.overflow = 'hidden';
+				//this.element.style.overflow = 'hidden';
 				if (this.element.tabIndex=-1) {
 					this.element.tabIndex = "0";
 				}
 				this.element.addEventListener("keydown",this,true);
 			},
 			handleEvent: function (event) {
-				console.log(event)
 				switch (event.type) {
 					case "keydown": return this.move(event);
 				}
@@ -74,14 +73,13 @@
 				//return parseFloat(this.element.ownerDocument.defaultView.getComputedStyle(this.element,null).webkitColumnWidth);
 			},
 			move: function (event) {
-				console.log(event.keyCode)
 				if (event.keyCode == 37) return this.moveBackward(event)
 				if (event.keyCode == 39) return this.moveForward(event)
 			},
 			moveForward: function () {
 				var columnWidth = this.getColumnWidth(),
 					newScrollLeft = this.element.scrollLeft + columnWidth
-				if (newScrollLeft+columnWidth <= this.element.scrollWidth) {
+				if (newScrollLeft+columnWidth < this.element.scrollWidth) {
 					this.element.scrollLeft += columnWidth;
 				}
 			},
