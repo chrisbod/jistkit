@@ -96,7 +96,7 @@ html,body {
 	left:0;
 	width: 15%;
 	bottom: 15%;
-	overflow: auto;
+ 	overflow:visible;
 }
 .news ul {
 	margin: 0;
@@ -106,14 +106,36 @@ html,body {
 	min-width: 100%;
 	min-height: 100%;
 	height: 100%;
+	-webkit-margin-before: 0;
+	-webkit-margin-after: 0;
+	-webkit-margin-start: 0;
+	-webkit-margin-end: 0;
+	-webkit-padding-start: 0;
 }
 .news ul li {
 	display: table-row;
+	-webkit-margin-before: 0;
+	-webkit-margin-after: 0;
+	-webkit-margin-start: 0;
+	-webkit-margin-end: 0;
+	-webkit-padding-start: 0;
 }
 .news ul li a {
 	display: table-cell;
+
+}
+.news ul li a div {
+	height: 100%;
 	position: relative;
 }
+.news ul li a div span {
+	position: absolute;
+	bottom: 0;
+	top: 0;
+	right:0;
+	width: 40%;
+}
+
 .news .news-articles-container {
 	position: absolute;
 	top: 15%;

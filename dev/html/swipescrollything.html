@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+	<head>
+		<script>
+			onload = function () {
+				new SwipyScrollyThing(document.getElementById('poop'))
+
+			}
+
+			function SwipyScrollyThing(element) {
+				this.element = element;
+				element.addEventListener("mouseup", this,true)
+				element.addEventListener("mousedown", this,true)
+				
+				element.addEventListener("scroll", this,true)
+
+			}
+			SwipyScrollyThing.prototype = {
+				handleEvent: function (event) {
+					switch (event.type) {
+						case "mousemove": return this.handleMouseMove(event);
+						case "scroll": return this.handleScroll(event);
+						case "mousedown": return this.handleMouseDown(event);
+						case "mouseup": return this.handleMouseUp(event);
+						case "mouseout": return this.handleMouseOut(event);
+					}
+				},
+				handleMouseMove: function (event) {
+					this.element.scrollLeft += event.webkitMovementX
+				},
+				handleScroll: function (event) {
+					console.log(event.type)
+				},
+				handleMouseDown: function (event) {
+					this.mouseIsDown = true;
+					this.element.addEventListener("mousemove", this,true);
+					this.element.addEventListener("mouseout", this,true);
+					event.preventDefault()
+					return false;
+				},
+				handleMouseUp: function (event) {
+					this.mouseIsUp = true;
+					this.element.removeEventListener("mousemove", this,true)
+				},
+				handleMouseOut: function (event) {
+
+				}
+			}
+
+
+		</script>
+
+	</head>
+
+	<body>
+		<div id="poop" style="overflow-x: auto; overflow-y: hidden; width: 300px; height: 100px">
+			<table>
+				<tr>
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+					<td>sfjdsfsd</td>
+
+
+				</tr>
+
+			</table>
+
+		</div>
+
+	</body>
+
+
+</html>
