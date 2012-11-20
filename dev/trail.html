@@ -135,7 +135,7 @@ PointerTrail.prototype = {
 		this.startEvent = event
 		event.preventDefault();
 	},
-	handleMouseMove: function (event) {
+	handleMouseMove: function (event) {//time events for removal of element time
 		var l = this.elements.length,
 			x  = event.webkitMovementX,
 			y = event.webkitMovementY;
