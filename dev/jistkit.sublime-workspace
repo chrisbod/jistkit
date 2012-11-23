@@ -4,6 +4,10 @@
 		"selected_items":
 		[
 			[
+				"handle",
+				"handleMouseMove"
+			],
+			[
 				"tab",
 				"table-row"
 			],
@@ -510,23 +514,16 @@
 			[
 				"ref",
 				"refreshFunction"
-			],
-			[
-				"read",
-				"readyForRelease"
 			]
 		]
 	},
 	"buffers":
 	[
 		{
-			"contents": "<!doctype html>\n<html>\n	<head>\n		<script>\n		window.DEBUG = true;\n		</script>\n		<link rel=\"stylesheet\" type=\"text/css\" href=\"../css/layout.css\"/>\n	</head>\n	<body>\n\n		<div id=\"primary-view\" class=\"view\">\n			<div id=\"primary-section-container\">\n				<section class=\"primary-section\">\n\n				</section>\n			</div>\n\n		</div>\n\n		<div id=\"primary-stats\" class=\"stats\"><!--summary of user stats-->\n\n\n		</div>\n\n		<div id=\"primary-dashboard\" class=\"dashboard\"><!--extended stats etc-->\n\n\n		</div>\n\n		<div id=\"primary-news\" class=\"news\"><!--placeholder for news and profile data -->\n			<nav>\n				<ul>\n					<li>\n						<a href=\"#\">\n							<header>FUEL</header>\n\n\n							\n							<p>You have been awarded numpty</p>\n						</a>\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n				</ul>\n			</nav>\n			<div class=\"news-articles-container\">\n				<section class=\"news-articles\">\n					<article class=\"news-article\"></article>\n					<article class=\"news-article\"></article>\n					<article class=\"news-article\"></article>\n				</section>\n			</div>\n		</div>\n\n		<div id=\"primary-contextual\" class=\"contextual\"><!-- contextual navigation related to current content of the active view -->\n			<nav>\n				<ul>\n					<li>\n						<a href=\"#\"></a>\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n				</ul>\n			</nav>\n			<div class=\"contextual-aside-container\">\n				<div class=\"contextual-asides\">\n					<aside class=\"contextual-aside\"></aside>\n					<aside class=\"contextual-aside\"></aside>\n					<aside class=\"contextual-aside\"></aside>\n				</div>\n			</div>\n		</div>\n\n		<div id=\"primary-navigation\" class=\"navigation\">\n			<nav>\n				<ul>\n					<li>\n						<a href=\"#\"></a>\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n					<li>\n						<a href=\"#\"></a>\n\n					</li>\n				<ul>\n			</nav>\n			<aside><!--contextual help etc?-->\n\n\n			<aside>\n		</div>\n		\n	</body>\n</html>",
 			"file": "html/layout.htm",
-			"file_size": 2863,
-			"file_write_time": 1353333753000000,
 			"settings":
 			{
-				"buffer_size": 2873,
+				"buffer_size": 2888,
 				"line_ending": "Unix"
 			}
 		},
@@ -534,8 +531,33 @@
 			"file": "css/layout.css",
 			"settings":
 			{
-				"buffer_size": 1658,
+				"buffer_size": 2004,
 				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "html/jiststyle.html",
+			"settings":
+			{
+				"buffer_size": 304,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "html/dev.html",
+			"settings":
+			{
+				"buffer_size": 382,
+				"line_ending": "Unix"
+			}
+		},
+		{
+			"file": "html/swipescrollything.html",
+			"settings":
+			{
+				"buffer_size": 2097,
+				"line_ending": "Unix",
+				"name": "<!doctype html>"
 			}
 		}
 	],
@@ -864,6 +886,7 @@
 		"case_sensitive": false,
 		"find_history":
 		[
+			"scroll",
 			" &&",
 			"startedTouches",
 			"TouchTracker",
@@ -990,8 +1013,7 @@
 			"channeltile",
 			"indexTile_",
 			"tileClickHandler",
-			"tileclick",
-			"timeout"
+			"tileclick"
 		],
 		"highlight": true,
 		"in_selection": false,
@@ -1073,7 +1095,7 @@
 	"groups":
 	[
 		{
-			"selected": 0,
+			"selected": 3,
 			"sheets":
 			[
 				{
@@ -1081,15 +1103,15 @@
 					"file": "html/layout.htm",
 					"settings":
 					{
-						"buffer_size": 2873,
+						"buffer_size": 2888,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								653,
-								653
+								688,
+								688
 							]
 						],
 						"settings":
@@ -1098,7 +1120,7 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 232.0,
+						"translation.y": 363.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
@@ -1108,15 +1130,15 @@
 					"file": "css/layout.css",
 					"settings":
 					{
-						"buffer_size": 1658,
+						"buffer_size": 2004,
 						"regions":
 						{
 						},
 						"selection":
 						[
 							[
-								1545,
-								1545
+								1895,
+								1926
 							]
 						],
 						"settings":
@@ -1125,7 +1147,89 @@
 							"translate_tabs_to_spaces": false
 						},
 						"translation.x": 0.0,
-						"translation.y": 1070.0,
+						"translation.y": 1370.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 2,
+					"file": "html/jiststyle.html",
+					"settings":
+					{
+						"buffer_size": 304,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 3,
+					"file": "html/dev.html",
+					"settings":
+					{
+						"buffer_size": 382,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								0,
+								0
+							]
+						],
+						"settings":
+						{
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
+						"zoom_level": 1.0
+					},
+					"type": "text"
+				},
+				{
+					"buffer": 4,
+					"file": "html/swipescrollything.html",
+					"settings":
+					{
+						"buffer_size": 2097,
+						"regions":
+						{
+						},
+						"selection":
+						[
+							[
+								1359,
+								1359
+							]
+						],
+						"settings":
+						{
+							"auto_name": "<!doctype html>",
+							"syntax": "Packages/HTML/HTML.tmLanguage",
+							"translate_tabs_to_spaces": false
+						},
+						"translation.x": 0.0,
+						"translation.y": 0.0,
 						"zoom_level": 1.0
 					},
 					"type": "text"
