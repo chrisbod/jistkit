@@ -64,6 +64,7 @@ onscroll fires only at the end of the touch/scroll
 		},
 		endShim: function jistTouchShim_endShim() {
 			this.target.addEventListener("mouseup",this,true);
+			this.target.addEventListener("click",this,true);
 		},
 		leaveShim: function jistTouchShim_leaveShim() {
 			if (this.nativeEvents.move) {
@@ -96,24 +97,28 @@ onscroll fires only at the end of the touch/scroll
 		} : function jistTouchShim_handleEventForPointerDevice (event) {
 			switch (event.type) {
 				case "mousemove": if (this.isTouching) {
-					return this.createTouchMove(event);
-					}
-					else {
-						return ;
-					}
+				return this.createTouchMove(event);
+				}
+				else {
+					return ;
+				}
 				case "mousedown": return this.createTouchStart(event);
-				case "mouseup": if (this.isTouching) {
-					return this.createTouchEnd(event);
+				case "mouseup": {
+					if (this.isTouching) {
+						return this.createTouchEnd(event);
 					}
 					else {
 						return ;
 					};
-				case "click": if (this.isTouching) {
-					return this.handleClick(event);
+				}
+				case "click": {
+					if (this.isTouching) {
+						return this.handleClick(event);
 					}
 					else {
 						return ;
 					};
+				}
 			}
 		},
 		createTouchMove: function jistTouchShim_createTouchMove(mouseMoveEvent) {
@@ -129,7 +134,7 @@ onscroll fires only at the end of the touch/scroll
 			return false;
 		},
 		createTouchEnd: function jistTouchShim_createTouchStart(mouseUpEvent) {
-			this.isTouching = false;
+			
 			this.lastMouseDownEvent = mouseUpEvent;
 			mouseUpEvent.stopPropagation();
 			mouseUpEvent.preventDefault();
@@ -139,16 +144,31 @@ onscroll fires only at the end of the touch/scroll
 			this.lastClickEvent = clickEvent;
 			clickEvent.stopPropagation();
 			clickEvent.preventDefault();
+			this.isTouching = false;
 			return false;
 		}
 	})
 	new JistTouchShim()
 
+	onload = function () {
+		var div = document.getElementsByTagName("div")[0];
+		var log = function (event) {
+			console.log(event.type,event)
+		}
+		div.addEventListener("touchstart",log)
+		div.addEventListener("touchmove",log)
+		div.addEventListener("touchend",log)
+		div.addEventListener("touchleave",log)
+		div.addEventListener("mousedown",log)
+		div.addEventListener("mouseup",log)
+		//div.addEventListener("mousemove",log)
+		div.addEventListener("click",log)
+	}
 	</script>
 	</head>
 	<body>
 
-
+		<div style="background-color: red; width: 100px; height: 100px; position: absolute; left: 100px; top: 100px"
 	</body>
 
 </html>
