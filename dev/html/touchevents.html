@@ -43,6 +43,10 @@ onscroll fires only at the end of the touch/scroll
 	}
 	JistTouchShim.jistExtend({
 		target: this,
+		isTouching: false,
+		lastMouseDownEvent: null,
+		lastMouseUpEvent: null,
+		lastMouseClickEvent: null,
 		nativeEvents: {
 			start: "ontouchstart" in this,
 			move: "ontouchmove" in this,
@@ -50,6 +54,7 @@ onscroll fires only at the end of the touch/scroll
 			leave: "ontouchleave" in this,
 			cancel: "ontouchcancel"  in this,
 		},
+
 		startShim: function jistTouchShim_startShim() {
 			this.target.addEventListener("mousedown",this,true);
 		},
@@ -97,8 +102,44 @@ onscroll fires only at the end of the touch/scroll
 						return ;
 					}
 				case "mousedown": return this.createTouchStart(event);
-				case "mouseup": return this.createTouchEnd(event);
+				case "mouseup": if (this.isTouching) {
+					return this.createTouchEnd(event);
+					}
+					else {
+						return ;
+					};
+				case "click": if (this.isTouching) {
+					return this.handleClick(event);
+					}
+					else {
+						return ;
+					};
 			}
+		},
+		createTouchMove: function jistTouchShim_createTouchMove(mouseMoveEvent) {
+			mouseMoveEvent.stopPropagation();
+			mouseMoveEvent.preventDefault();
+			return false;
+		},
+		createTouchStart: function jistTouchShim_createTouchStart(mouseDownEvent) {
+			this.isTouching = true;
+			this.lastMouseDownEvent = mouseDownEvent;
+			mouseDownEvent.stopPropagation();
+			mouseDownEvent.preventDefault();
+			return false;
+		},
+		createTouchEnd: function jistTouchShim_createTouchStart(mouseUpEvent) {
+			this.isTouching = false;
+			this.lastMouseDownEvent = mouseUpEvent;
+			mouseUpEvent.stopPropagation();
+			mouseUpEvent.preventDefault();
+			return false;
+		},
+		handleClick: function jistTouchShim_handleClick(clickEvent) {
+			this.lastClickEvent = clickEvent;
+			clickEvent.stopPropagation();
+			clickEvent.preventDefault();
+			return false;
 		}
 	})
 	new JistTouchShim()
