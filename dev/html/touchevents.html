@@ -25,6 +25,7 @@ this event can fire a few times between touchstart and touchend (even if a click
 onscroll fires only at the end of the touch/scroll
 
 
+
 	-->
 	<script>
 	Function.prototype.jistExtend = function (definition) {
@@ -51,20 +52,25 @@ onscroll fires only at the end of the touch/scroll
 			start: "ontouchstart" in this,
 			move: "ontouchmove" in this,
 			end: "ontouchend" in this,
+			enter: "ontouchenter" in this,
 			leave: "ontouchleave" in this,
 			cancel: "ontouchcancel"  in this,
 		},
 
 		startShim: function jistTouchShim_startShim() {
 			this.target.addEventListener("mousedown",this,true);
+			this.target.addEventListener("mousemove",this,true);
 		},
 		moveShim: function jistMoveShim_moveShim() {
 			//we're not going to attach and detach move events on the fly (at least for the moment)
-			this.target.addEventListener("mousemove",this,true);
+			//
 		},
 		endShim: function jistTouchShim_endShim() {
-			this.target.addEventListener("mouseup",this,true);
-			this.target.addEventListener("click",this,true);
+			//this.target.addEventListener("mouseup",this,true);
+			//this.target.addEventListener("click",this,true);
+		},
+		enterShim: function jistTouchShim_enterShim() {
+			//
 		},
 		leaveShim: function jistTouchShim_leaveShim() {
 			if (this.nativeEvents.move) {
@@ -79,6 +85,12 @@ onscroll fires only at the end of the touch/scroll
 			} else {
 				this.cancelShimForPointerDevice()
 			}
+		},
+		enterShimForTouchDevice: function jistTouchShim_enterShimForTouchDevice() {
+
+		},
+		enterShimForPointerDevice: function jistTouchShim_enterShimForPointerDevice() {
+
 		},
 		leaveShimForTouchDevice: function jistTouchShim_leaveShimForTouchDevice() {
 
@@ -96,11 +108,8 @@ onscroll fires only at the end of the touch/scroll
  			
 		} : function jistTouchShim_handleEventForPointerDevice (event) {
 			switch (event.type) {
-				case "mousemove": if (this.isTouching) {
+				case "mousemove": {
 				return this.createTouchMove(event);
-				}
-				else {
-					return ;
 				}
 				case "mousedown": return this.createTouchStart(event);
 				case "mouseup": {
@@ -128,25 +137,72 @@ onscroll fires only at the end of the touch/scroll
 		},
 		createTouchStart: function jistTouchShim_createTouchStart(mouseDownEvent) {
 			this.isTouching = true;
+			this.currentElement = mouseDownEvent.target;
 			this.lastMouseDownEvent = mouseDownEvent;
 			mouseDownEvent.stopPropagation();
 			mouseDownEvent.preventDefault();
+			this.target.addEventListener("mouseup",this,true);
+			this.target.addEventListener("click",this,true);
+			this.createTouchEvent("touchstart",mouseDownEvent);
 			return false;
 		},
 		createTouchEnd: function jistTouchShim_createTouchStart(mouseUpEvent) {
-			
-			this.lastMouseDownEvent = mouseUpEvent;
+			this.lastMouseUpEvent = mouseUpEvent;
 			mouseUpEvent.stopPropagation();
-			mouseUpEvent.preventDefault();
+			mouseUpEvent.preventDefault();	
+			this.createTouchEvent("touchend",mouseUpEvent);
+			this.dispatchUIEvents();
 			return false;
 		},
 		handleClick: function jistTouchShim_handleClick(clickEvent) {
-			this.lastClickEvent = clickEvent;
+			this.target.removeEventListener("click",this)
 			clickEvent.stopPropagation();
 			clickEvent.preventDefault();
 			this.isTouching = false;
 			return false;
+		},
+		createTouchEvent: function jistTouchShim_createTouchEvent(eventName,sourceEvent) {
+			var touchEvent = document.createEvent('Event');
+			touchEvent.altKey = sourceEvent.altKey;
+			touchEvent.ctrlKey = sourceEvent.ctrlKey;
+			touchEvent.metaKey = sourceEvent.metaKey;
+			touchEvent.shiftKey = sourceEvent.shiftKey;
+			touchEvent.target = this.currentElement;
+			this.createTouchLists(touchEvent,sourceEvent);
+			touchEvent.initEvent(eventName, false, false);
+			this.currentElement.dispatchEvent(touchEvent);
+
+		},
+		createTouchLists: function (touchEvent,sourceEvent) {
+			touchEvent.changedTouches = this.changedTouches = [];
+			touchEvent.targetTouches = this.targetTouches = [];
+			touchEvent.touches = this.touches = [];
+		},
+		dispatchUIEvents: function () {
+			this.target.removeEventListener("mousemove",this,true);
+			this.target.removeEventListener("mouseup",this,true);
+			this.target.removeEventListener("click",this,true);
+			this.target.removeEventListener("mousedown",this,true);
+			this.dispatchUIEvent("mousemove",this.lastMouseDownEvent);
+			this.dispatchUIEvent("mousedown",this.lastMouseDownEvent);
+			this.dispatchUIEvent("mouseup",this.lastMouseUpEvent);
+			delete this.lastMouseDownEvent;
+			delete this.lastMouseUpEvent;
+			delete this.currentElement;
+			delete this.isTouching;
+			this.target.addEventListener("mousedown",this,true);
+			this.target.addEventListener("mousemove",this,true);
+		},
+		dispatchUIEvent: function (eventType,sourceEvent) {
+			this.target.removeEventListener(eventType,this);
+			var uiEvent = document.createEvent("MouseEvents");
+			uiEvent.initMouseEvent(eventType, sourceEvent.canBubble, sourceEvent.cancelable, sourceEvent.view, 
+                     sourceEvent.detail, sourceEvent.screenX, sourceEvent.screenY, sourceEvent.clientX, sourceEvent.clientY, 
+                     sourceEvent.ctrlKey, sourceEvent.altKey, sourceEvent.shiftKey, sourceEvent.metaKey, 
+                     sourceEvent.button, sourceEvent.relatedTarget);
+			this.currentElement.dispatchEvent(uiEvent);
 		}
+
 	})
 	new JistTouchShim()
 
@@ -161,7 +217,7 @@ onscroll fires only at the end of the touch/scroll
 		div.addEventListener("touchleave",log)
 		div.addEventListener("mousedown",log)
 		div.addEventListener("mouseup",log)
-		//div.addEventListener("mousemove",log)
+		div.addEventListener("mousemove",log)
 		div.addEventListener("click",log)
 	}
 	</script>
