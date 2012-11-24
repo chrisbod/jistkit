@@ -1,0 +1,79 @@
+<html>
+
+<head>
+	<style>
+	html,body {
+		margin:0;
+		padding: 0;
+	}
+		body {
+			width: 100%;
+			height: 100%;
+
+		}
+		div {
+			position: absolute;
+			width: 50px;
+			height: 50px;
+			border: 1px solid blue;
+		}
+
+	</style>
+<script>
+	function OvalDistributer(container,rectangles) {
+		this.rectangles = rectangles;
+		this.container = container;
+		this.angles = this.getAngles();
+		alert(this.angles)
+
+	}
+	OvalDistributer.prototype  = {
+		getAngles: function () {
+			var angleIncrement = 360/this.rectangles.length,
+				angle = 0;
+				angles = [];
+			for (var i=0;i<this.rectangles.length;i++) {
+				angles.push(angle+angleIncrement)
+			}
+			return angles
+
+			/*
+			var containerCenter = {x:this.container.width/2,y:this.container.height/2);
+			var topRectangle = this.rectangles[0]
+			var ovalVerticalRadius = containerCenter.y-(topRectangle.height/2);
+			var ovalHorizontalRadius = containerCenter.x-(topRectangle.width/2);
+			var a = Math.max(ovalVerticalRadius,ovalHorizontalRadius);
+			var b = Math.min(ovalVerticalRadius,ovalHorizontalRadius);
+			var isHorizontal = b == ovalHorizontalRadius;
+			var focalDistance = (a*a)+(b*b);
+			var X = container.x + (a * Math.cos(alpha));
+			var Y = container.y + (b * Math.sin(alpha));*/
+
+
+
+		}
+
+
+	}
+
+
+</script>
+</head>
+	<body>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+		<div></div>
+
+
+	</body>
+
+</html>
