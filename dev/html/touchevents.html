@@ -1,0 +1,113 @@
+<!doctype html>
+<html>
+	<head>
+		<!--
+Just wanted to put this in writing for your reference (nothing new here though really)
+
+Event order for webkit touch:
+touchstart
+touchmove
+touchend
+
+mousemove (single one with positioning data identical to touchend)
+mousedown
+mouseup
+click
+
+touchleave and touchcancel are not supported by webkit (which sucks a little - you can shim touchleave with touchmove (and perhaps touchcancel but it woudl be a bit filthy/buggy I suspectl)
+
+the touchmove event fires somewhat differently to mousemove - in that it fires continuously on the element you touched to begin with regardless of where you're actually touching
+similarly the touchend will fire on the element even when the touch finishes well off the element
+
+the touchmove event
+this event can fire a few times between touchstart and touchend (even if a click is then decided upon) and I'm not sure what the tolerance is (time/ distance etc) before webkit decides it's not a click at all). hence native scrolling visibly moving and a click still firing after the move
+
+onscroll fires only at the end of the touch/scroll
+
+
+	-->
+	<script>
+	Function.prototype.jistExtend = function (definition) {
+		for (var i in definition) {
+			this.prototype[i] = definition[i];
+		}
+		return this.prototype;
+	}
+	function JistTouchShim(target) {
+		if (target) {
+			this.target = document.documentElement;
+		}
+		for (var i in this.nativeEvents) {
+			if (!this.nativeEvents[i]) this[i+"Shim"]();
+		}
+	}
+	JistTouchShim.jistExtend({
+		target: this,
+		nativeEvents: {
+			start: "ontouchstart" in this,
+			move: "ontouchmove" in this,
+			end: "ontouchend" in this,
+			leave: "ontouchleave" in this,
+			cancel: "ontouchcancel"  in this,
+		},
+		startShim: function jistTouchShim_startShim() {
+			this.target.addEventListener("mousedown",this,true);
+		},
+		moveShim: function jistMoveShim_moveShim() {
+			//we're not going to attach and detach move events on the fly (at least for the moment)
+			this.target.addEventListener("mousemove",this,true);
+		},
+		endShim: function jistTouchShim_endShim() {
+			this.target.addEventListener("mouseup",this,true);
+		},
+		leaveShim: function jistTouchShim_leaveShim() {
+			if (this.nativeEvents.move) {
+				this.leaveShimForTouchDevice()
+			} else {
+				this.leaveShimForPointerDevice()
+			}
+		},
+		cancelShim: function jistTouchShim_cancelShim() {
+			if (this.nativeEvents.move) {
+				this.cancelShimForTouchDevice()
+			} else {
+				this.cancelShimForPointerDevice()
+			}
+		},
+		leaveShimForTouchDevice: function jistTouchShim_leaveShimForTouchDevice() {
+
+		},
+		leaveShimForPointerDevice: function jistTouchShim_leaveShimForPointerDevice() {
+
+		},
+		cancelShimForTouchDevice: function jistTouchShim_cancelShimForTouchDevice() {
+
+		},
+		cancelShimForPointerDevice: function jistTouchShim_cancelShimForPointerDevice() {
+
+		},
+		handleEvent: ("ontouchstart" in document.documentElement) ? function jistTouchShim_handleEventForTouchDevice (event) {
+ 			
+		} : function jistTouchShim_handleEventForPointerDevice (event) {
+			switch (event.type) {
+				case "mousemove": if (this.isTouching) {
+					return this.createTouchMove(event);
+					}
+					else {
+						return ;
+					}
+				case "mousedown": return this.createTouchStart(event);
+				case "mouseup": return this.createTouchEnd(event);
+			}
+		}
+	})
+	new JistTouchShim()
+
+	</script>
+	</head>
+	<body>
+
+
+	</body>
+
+</html>
