@@ -5,13 +5,15 @@
 			body,html {
 			}
 			div.columned h1 {
+				font-size: 30px;
 			}
 			div.columned {
-				-webkit-column-width: 20em;
+				-webkit-column-width: 320px;
 				height: 100%;
 				padding: 0 0.4ex 0 0.5ex;
-				-webkit-column-gap: 1ex;
+				-webkit-column-gap: 0ex;
 				overflow: hidden;
+				box-sizing: border-box;
 			}
 
 			img {
@@ -19,9 +21,10 @@
 				height: 5em;
 			}
 			section {
-				width: 400px;
+				width: 4000px;
 				height: 300px;
 				overflow-x: auto;
+				outline: 1px solid red;
 			}
 
 			@-webkit-keyframes trigger {
@@ -37,6 +40,11 @@
 	   -webkit-animation-delay: 0s;             /* 0 is the default */
 	   -webkit-animation-iteration-count: 1;    /* 1 is the default */
 	   -webkit-animation-direction: alternate;  /* normal is the default */
+	}
+
+	div.rect {
+
+
 	}
 			
 		</style>
@@ -91,6 +99,7 @@
 		}
 
 		addEventListener("webkitAnimationEnd", function (event) {//TODO think about json.parse instead...
+			
 			var types = eval('({'+event.target.getAttribute("data-jistkit")+'})');
 			for (var i=0, keys = Object.keys(types), l = keys.length, key, path, Constructor = JistKit;i!=l;i++) {
 				key = keys[i];
@@ -103,6 +112,77 @@
 			}
 		}
 		,true)
+
+		onload = function () {
+			function addClientRectsOverlay(elt) {
+			    // Absolutely position a div over each client rect so that its border width
+			    // is the same as the rectangle's width.
+			    // Note: the overlays will be out of place if the user resizes or zooms.
+			    var rects = elt.getClientRects();
+			   
+			    for (var i = 0; i != rects.length; i++) {
+			        var rect = rects[i];
+			        var tableRectDiv = document.createElement('div');
+			        tableRectDiv.classList.add("rect")
+			        tableRectDiv.style.position = 'absolute';
+			        tableRectDiv.style.border = '1px solid red';
+			        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
+			        var scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
+			        tableRectDiv.style.margin = tableRectDiv.style.padding = '0';
+			        tableRectDiv.style.top = (rect.top + scrollTop) + 'px';
+			        tableRectDiv.style.left = (rect.left + scrollLeft) + 'px';
+			        // we want rect.width to be the border width, so content width is 2px less.
+			        tableRectDiv.style.width = (rect.width - 2) + 'px';
+			        tableRectDiv.style.height = (rect.height - 2) + 'px';
+			        document.body.appendChild(tableRectDiv);
+			    }
+			}
+			
+function ColumnSplitter(element) {
+			this.element = element;
+			this.children = element.children;
+			this.computedStyle = getComputedStyle(element,null)
+		}
+		ColumnSplitter.prototype.split = function () {
+			var rect = this.element.getBoundingClientRect(),
+				bottom = rect.bottom,
+				newDiv,
+				child,
+				childFragment = document.createDocumentFragment(),
+				childRect;
+			for (var i=0,children = this.children,child,childRect;i!=children.length;i++) {
+					child = this.children[i];
+					childRect = this.children[i].getBoundingClientRect();
+					childFragment.appendChild(child.cloneNode(true))
+				if (childRect.top<rect.top||childRect.bottom>bottom) {
+					break;
+				} 
+			}
+			newDiv = this.createNewContainer(child,rect.height)
+			newDiv.appendChild(childFragment);
+			document.getElementById('foo').appendChild(newDiv)
+		}
+		ColumnSplitter.prototype.generateContainers = function (children,clientRect) {
+
+		}
+		ColumnSplitter.prototype.createNewContainer = function (child,height) {
+			var container = this.element.cloneNode(false);
+			container.style.width = (child.getBoundingClientRect().width)+"px";
+			container.style.webkitColumnGap = (parseFloat(this.computedStyle.paddingRight)+parseFloat(this.computedStyle.paddingLeft))+"px"
+			container.style.height = height+"px";
+			container.style.backgroundColor = "red"
+			return container;
+		}
+		var cs = new ColumnSplitter(document.querySelector(".columned"))
+		cs.split()
+		var elements = document.querySelectorAll(".columned *");
+			for (var i=0;i<elements.length;i++) {
+				addClientRectsOverlay(elements[i])
+			}
+			addClientRectsOverlay(document.querySelector(".columned h1"))
+			addClientRectsOverlay(document.querySelector("#foo"))
+		}
+		
 		</script>
 	</head>
 	<body>
@@ -111,9 +191,9 @@
 			<h1>Let's see what we can do with column css</h1>
 			<p>HIERARCHY_REQUEST_ERR: Raised if this node is of a type that does not allow children of the type of the newChild node, or if the node to put in is one of this node's ancestors or this node itself, or if this node is of type Document and the result of the replacement operation would add a second DocumentType or Element on the Document node.</p>
 
-<p>WRONG_DOCUMENT_ERR: Raised if newChild was created from a different document than the one that created this node.</p>
+<p>WRONG_DOCUMENT_ERR: Raised if newChild was created from a different document than the one that created this node.  OVERFLOWS HERE</p>
 
-<p>NO_MODIFICATION_ALLOWED_ERR: Raised if this node or the parent of the new node is readonly.</p>
+<p>NEW COLUMN NO_MODIFICATION_ALLOWED_ERR: Raised if this node or the parent of the new node is readonly.</p>
 
 <p>NOT_FOUND_ERR: Raised if oldChild is not a child of this node.</p>
 	<img style="float:left">
@@ -145,7 +225,9 @@
 <p>NOT_SUPPORTED_ERR: if this node is of type Document, this exception might be raised if the DOM implementation doesn't support the replacement of the DocumentType child or Element child.</p>
 		</div>
 </section>
+	<div id="foo" style="margin-top: 100px; float: left"> 
 
+	</div>
 	</body>
 
 
