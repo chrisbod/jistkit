@@ -1,12 +1,9 @@
 describe("JistKit", function () {
-
 var element = document.documentElement,
 	temporaryPointer;
   it ("jistkit should be reported in HTMLElements", function () {
   	expect(("jistkit" in element)).toEqual(true);
   }
-
-
   );
   it("elements should return the same object on each call to their jistkit property ", function() {
    // player.play(song);
@@ -15,20 +12,25 @@ var element = document.documentElement,
   it("'element' property of instance of jistkit should point to the element it is attached to", function () {
   	expect(element.jistkit.element).toEqual(element);
   })
-  it("jistkit objects should be disposable", function () {
+  it("jistkit objects properties should be disposed when the dispose method is called...", function () {
   	element.jistkit.dummyProperty = 1;
   	element.jistkit.dispose()
   	expect(element.jistkit.dummyProperty).toNotEqual(1);
   	
   })
   it("jistkit objects' element property should neither be settable nor deletable", function () {
+  	//TODO decide if this is really the correct behaviour as it creates a circular reference...
 	expect(element.jistkit.hasOwnProperty("element")).toEqual(true);
   	delete element.jistkit.element;
-
   	expect(element.jistkit.hasOwnProperty("element")).toEqual(true)
   	element.jistkit.element = null
   	expect(element.jistkit.element).toNotEqual(null)
+  });
+  it ("jistkit property can be set to null and the next call will return a fresh jistkit", function () {
+  	var firstJistkit = element.jistkit;
+  	element.jistkit.foo = true;
+  	element.jistkit = null;
+  	expect(element.jistkit.foo).toNotEqual(true)
+  	expect(element.jistkit).toNotEqual(firstJistkit);
   })
-
-
 });
