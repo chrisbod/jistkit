@@ -1,4 +1,7 @@
 function JistKit(element) {
+	Object.defineProperty(this,this.ownerPropertyName,{
+		value: element
+	})
 	this[this.ownerPropertyName] = element;
 }
 JistKit.createOnDemandProperty = function (targetObject,property,Constructor) {
@@ -10,23 +13,24 @@ JistKit.createOnDemandProperty = function (targetObject,property,Constructor) {
 				configurable: true
 			})
 			return object;
-		}
+		},
 		configurable: true
 	})
 }
 JistKit.prototype = {
 	ownerPropertyName: "element",
+	element: null,
 	dispose: function jistKit_dispose(nonRecursive) {
 		for (var keys = Object.keys(this),l=keys.length-1;l!=-1;l--) {
 			if (!nonRecursive && typeof this[keys[l]].dispose == "function") {
 				this[keys[l]].dispose();
 			}
-			delete this[keys[l]];
-		}//NOTE: to finish dispose delete or set to null the actual slot in the instance
+			if (keys[l] != "element") delete this[keys[l]];
+		}
 	}
 };
 //'Restore' prototype so it's not an object literal but an instance of JistKit!
 //This will also 
-JistKit.prototype = Object.create(JistKit.prototype});
+JistKit.prototype = Object.create(JistKit.prototype);
 //Create the 'ondemand' slot in HTMLElement object
 JistKit.createOnDemandProperty(HTMLElement.prototype,"jistkit",JistKit);
