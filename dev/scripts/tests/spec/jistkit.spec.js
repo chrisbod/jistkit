@@ -34,3 +34,26 @@ var element = document.documentElement,
   	expect(element.jistkit).toNotEqual(firstJistkit);
   })
 });
+//okay dummy extender tests should be elsewhere (and should be run on EVERY extender) really but they're pretty central to jistKit
+describe("JistKit.DummyExtender", function () {
+	var element = document.documentElement;
+it ("dummy property should now exist in element.jistkit", function () {
+  	expect(("dummy" in element.jistkit)).toEqual(true);
+  })
+it ("dummy property should be an instance of JistKitDummyExtender", function () {
+	  expect(element.jistkit.dummy instanceof JistKit.DummyExtender)
+})
+it ("dummy property should return same object", function () {
+	var dummy = element.jistkit.dummy;
+	expect(dummy).toEqual(element.jistkit.dummy)
+})
+it ("DummyExtender should not be in global namespace", function () {
+	expect(typeof JistKit_DummyExtender).toEqual("undefined")
+})
+it ("dummy property should be settable to null etc", function () {
+	var dummy = element.jistkit.dummy;
+	element.jistkit.dummy = null
+	expect(dummy==element.jistkit.dummy).toEqual(false)
+
+});
+})

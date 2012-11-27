@@ -1,18 +1,18 @@
-function JistKit(element) {
+function JistKit(owner) {
 	Object.defineProperty(this,this.ownerPropertyName,{
-		value: element
+		value: owner
 	})
 }
-JistKit.createOnDemandProperty = function (targetObject,property,Constructor) {
+JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,property,Constructor) {
 	Object.defineProperty(targetObject,property,{
-		get: function JistKit_onPrototypicalDemand_get() {
+		get: function JistKit_createOnDemandProperty_get() {
 			var object = new Constructor(this);//important on demand property will ALWAYS pass the object being attached to it
 			Object.defineProperty(this,property,{
-				get: function () {
+				get: function JistKit_createOnDemandProperty_override_get() {
 					if (object==null) object = new Constructor(this);
 					return object;
 				},
-				set: function (value) {
+				set: function JistKit_createOnDemandProperty_override_set(value) {
 					if (value===null) object = null;
 					return object;
 				}
