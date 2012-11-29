@@ -8,8 +8,7 @@
         <script>
            
 
-        function ScrollFixer(element) {
-          this.element = element;
+        function ScrollFixer() {
           this.eventChain = [];
         }
         ScrollFixer.prototype = {
@@ -17,10 +16,10 @@
           startX: -1,
           tree: null,
           attach: function () {
-            this.element.addEventListener("touchstart",this,true)
-            this.element.addEventListener("touchend",this,true)
-            this.element.addEventListener("touchcancel",this,true)
-            this.element.addEventListener("touchmove",this,true)     
+            window.addEventListener("touchstart",this,true)
+            window.addEventListener("touchend",this,true)
+            window.addEventListener("touchcancel",this,true)
+            window.addEventListener("touchmove",this,true)     
           },
           handleEvent: function (event) {
 
@@ -32,6 +31,7 @@
             }
           },
           handleTouchMove: function (event) {
+            if (event.touches.length>1) return
             if (this.startY != -1) {
               var verticalDirection = event.touches[0].pageY-this.startY,
                   horizontalDirection = event.pageX-this.startX;
@@ -40,6 +40,7 @@
                   clientHeight = node.clientHeight;
                   scrollHeight = node.scrollHeight;
                   scrollTop = node.scrollTop;
+
                   if (scrollHeight > clientHeight) {
                       if (
                             (verticalDirection > 0 && scrollTop > 0) ||
@@ -53,14 +54,21 @@
             return event.preventDefault();
           },
           handleTouchStart: function (event) {
+            if (event.touches.length>1) return;
             this.eventChain.length = 0;
             this.startY = event.touches[0].pageY;
             this.startX = event.touches[0].pageX;
             var currentNode = event.target;
+           // if (currentNode != document.documentElement) {
               this.eventChain[0] = currentNode;
-              for (var currentNode = event.target;currentNode!=this.element.parentNode;currentNode=currentNode.parentNode) {
+              for (var currentNode = event.target;currentNode!=document.body;currentNode=currentNode.parentNode) {
                 this.eventChain.push(currentNode);
-              }            
+              }
+           // } else {
+           //   this.eventChain = []
+           // }
+            console.log(this.eventChain)
+            
           },
           handleTouchFinish: function () {
             this.eventChain.length = 0;
@@ -68,13 +76,12 @@
             delete this.startY;
           }
         }
-        onload = function () {
-          var sf = new ScrollFixer(document.querySelector(".scroller"));
+
+        var sf = new ScrollFixer();
         sf.attach()
-        }
 
-        
 
+ 
 
   
 
