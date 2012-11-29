@@ -31,54 +31,73 @@
             }
           },
           handleTouchMove: function (event) {
-            if (event.touches.length>1) return
-            if (this.startY != -1) {
-              var verticalDirection = event.touches[0].pageY-this.startY,
-                  horizontalDirection = event.pageX-this.startX;
-              for (var chain = this.eventChain,i=chain.length-1,node,nodeHeight;i!=-1;i--) {
-                  node = chain[i];
-                  clientHeight = node.clientHeight;
-                  scrollHeight = node.scrollHeight;
-                  scrollTop = node.scrollTop;
-
-                  if (scrollHeight > clientHeight) {
-                      if (
-                            (verticalDirection > 0 && scrollTop > 0) ||
-                            (verticalDirection < 0 && scrollTop < scrollHeight - clientHeight)
-                          ) {
-                        return;
-                      }
-                  }
+            if (event.touches.length==1) {
+              if (this.startY != -1) {
+                var verticalDirection = event.touches[0].pageY-this.startY,
+                    horizontalDirection = event.pageX-this.startX;
+                for (var chain = this.eventChain,i=chain.length-1,node,clientHeight,scrollHeight,scrollTop;i!=-1;i--) {
+                    node = chain[i];
+                    clientHeight = node.clientHeight;
+                    scrollHeight = node.scrollHeight;
+                    scrollTop = node.scrollTop;
+                    if (scrollHeight > clientHeight) {
+                        if (
+                              (verticalDirection > 0 && scrollTop > 0) ||
+                              (verticalDirection < 0 && scrollTop < scrollHeight - clientHeight)
+                            ) {
+                          return;
+                        }
+                    }
+                }
               }
             }
-            return event.preventDefault();
+            return event.preventDefault(); 
           },
           handleTouchStart: function (event) {
-            if (event.touches.length>1) return;
-            this.eventChain.length = 0;
-            this.startY = event.touches[0].pageY;
-            this.startX = event.touches[0].pageX;
-            var currentNode = event.target;
-           // if (currentNode != document.documentElement) {
-              this.eventChain[0] = currentNode;
-              for (var currentNode = event.target;currentNode!=document.body;currentNode=currentNode.parentNode) {
-                this.eventChain.push(currentNode);
+            if (event.touches.length==1) {
+              this.eventChain.length = 0;
+              this.startY = event.touches[0].pageY;
+              this.startX = event.touches[0].pageX;
+              var currentNode = event.target;
+              
+              if (currentNode) {
+                this.eventChain[0] = currentNode;
+                for (;currentNode!=document.body;currentNode=currentNode.parentNode) {
+                  this.eventChain.push(currentNode);
+                }
               }
-           // } else {
-           //   this.eventChain = []
-           // }
-            console.log(this.eventChain)
-            
+            }
           },
           handleTouchFinish: function () {
             this.eventChain.length = 0;
             delete this.startX;
             delete this.startY;
+          },
+          getElementScrollingDetails: function (element) {
+            var scrollDirections = {horizontal:false,vertical:false},
+                horizontalOverflow = element.scrollWidth <= element.clientWidth,
+                verticalOverflow = element.scrollHeight <= element.clientHeight,
+                computedStyle;
+            if (!horizontalOverflow&&!verticalOverflow) {
+              return scrollDirections;
+            }
+            computedStyle = getComputedStyle(element,null);
+            if (verticalOverflow && /auto|scroll/.test(computedStyle.overflowY)) {
+                scrollDirections.vertical = true;
+            }
+             if (horizontalOverflow && /auto|scroll/.test(computedStyle.overflowX)) {
+                scrollDirections.horizontal = true;
+            }
+            return scrollDirections;
+
           }
         }
 
-        var sf = new ScrollFixer();
+
+        onload = function () {
+        var sf = new ScrollFixer(document.querySelector(".scroller"));
         sf.attach()
+       }
 
 
  
@@ -91,7 +110,7 @@
 
         .scroller {
             overflow: scroll;
-           s-webkit-overflow-scrolling: touch;
+           webkit-overflow-scrolling: touch;
             width: 200px;
             height: 300px;
             position:absolute;
