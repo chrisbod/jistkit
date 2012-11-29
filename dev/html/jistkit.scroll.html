@@ -1,0 +1,107 @@
+<!doctype html>
+<html>
+    <head>
+        <script>
+        window.DEBUG = true;
+        </script>
+        <script src="../scripts/jistkit/jistkit.js"></script>
+        <script>
+           
+
+        function ScrollFixer(element) {
+          this.element = element;
+          this.eventChain = [];
+        }
+        ScrollFixer.prototype = {
+          startY: -1,
+          startX: -1,
+          tree: null,
+          attach: function () {
+            this.element.addEventListener("touchstart",this,true)
+            this.element.addEventListener("touchend",this,true)
+            this.element.addEventListener("touchcancel",this,true)
+            this.element.addEventListener("touchmove",this,true)     
+          },
+          handleEvent: function (event) {
+
+            switch(event.type) {
+              case "touchmove": return this.handleTouchMove(event);
+              case "touchstart": return this.handleTouchStart(event);
+              case "touchend":
+              case "touchcancel": return this.handleTouchFinish(event);
+            }
+          },
+          handleTouchMove: function (event) {
+            if (this.startY != -1) {
+              var verticalDirection = event.touches[0].pageY-this.startY,
+                  horizontalDirection = event.pageX-this.startX;
+              for (var chain = this.eventChain,i=chain.length-1,node,nodeHeight;i!=-1;i--) {
+                  node = chain[i];
+                  clientHeight = node.clientHeight;
+                  scrollHeight = node.scrollHeight;
+                  scrollTop = node.scrollTop;
+                  if (scrollHeight > clientHeight) {
+                      if (
+                            (verticalDirection > 0 && scrollTop > 0) ||
+                            (verticalDirection < 0 && scrollTop < scrollHeight - clientHeight)
+                          ) {
+                        return;
+                      }
+                  }
+              }
+            }
+            return event.preventDefault();
+          },
+          handleTouchStart: function (event) {
+            this.eventChain.length = 0;
+            this.startY = event.touches[0].pageY;
+            this.startX = event.touches[0].pageX;
+            var currentNode = event.target;
+              this.eventChain[0] = currentNode;
+              for (var currentNode = event.target;currentNode!=this.element.parentNode;currentNode=currentNode.parentNode) {
+                this.eventChain.push(currentNode);
+              }            
+          },
+          handleTouchFinish: function () {
+            this.eventChain.length = 0;
+            delete this.startX;
+            delete this.startY;
+          }
+        }
+        onload = function () {
+          var sf = new ScrollFixer(document.querySelector(".scroller"));
+        sf.attach()
+        }
+
+        
+
+
+  
+
+     
+        </script>
+        <style>
+
+        .scroller {
+            overflow: scroll;
+           s-webkit-overflow-scrolling: touch;
+            width: 200px;
+            height: 300px;
+            position:absolute;
+            border: 1px solid blue;
+
+        }
+        .scroller p {
+            margin: 20px;
+            border: 1px solid red;
+        }
+
+        </style>
+    </head>
+    <body>
+        <div class="scroller">
+            <p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p><p>asdjashd<br/>asdasdasdas</p>
+        </div>
+        
+    </body>
+</html>
