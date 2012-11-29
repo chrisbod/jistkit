@@ -31,27 +31,32 @@
             }
           },
           handleTouchMove: function (event) {
-            if (event.touches.length==1) {
+            if (event.touches.length==1 && this.eventChain.length) {
               if (this.startY != -1) {
                 var verticalDirection = event.touches[0].pageY-this.startY,
                     horizontalDirection = event.pageX-this.startX;
-                for (var chain = this.eventChain,i=chain.length-1,node,clientHeight,scrollHeight,scrollTop;i!=-1;i--) {
-                    node = chain[i];
-                    clientHeight = node.clientHeight;
-                    scrollHeight = node.scrollHeight;
-                    scrollTop = node.scrollTop;
-                    if (scrollHeight > clientHeight) {
+                for (var chain = this.eventChain,
+                        i=chain.length-1,
+                        element,
+                        scrollWidth,
+                        scrollLeft,
+                        clientWidth;
+                        i!=-1;
+                        i--) {
+                    element = chain[i].element;
+                    if (chain[i].vertical && element.scrollHeight > element.clientHeight) {
                         if (
-                              (verticalDirection > 0 && scrollTop > 0) ||
-                              (verticalDirection < 0 && scrollTop < scrollHeight - clientHeight)
+                              (verticalDirection > 0 && element.scrollTop > 0) ||
+                              (verticalDirection < 0 && element.scrollTop < element.scrollHeight - element.clientHeight)
                             ) {
                           return;
                         }
                     }
                 }
               }
+              return event.preventDefault(); 
             }
-            return event.preventDefault(); 
+            
           },
           handleTouchStart: function (event) {
             if (event.touches.length==1) {
@@ -59,12 +64,11 @@
               this.startY = event.touches[0].pageY;
               this.startX = event.touches[0].pageX;
               var currentNode = event.target;
-              
-              if (currentNode) {
-                this.eventChain[0] = currentNode;
-                for (;currentNode!=document.body;currentNode=currentNode.parentNode) {
-                  this.eventChain.push(currentNode);
-                }
+              for (var scrollDetails;currentNode && currentNode!=document.body && currentNode!= document.documentElement;currentNode=currentNode.parentNode) {
+                    scrollDetails = this.getElementScrollingDetails(currentNode)
+                    if (scrollDetails.vertical||scrollDetails.horizontal) {
+                        this.eventChain.push(scrollDetails);
+                    }
               }
             }
           },
@@ -74,9 +78,9 @@
             delete this.startY;
           },
           getElementScrollingDetails: function (element) {
-            var scrollDirections = {horizontal:false,vertical:false},
-                horizontalOverflow = element.scrollWidth <= element.clientWidth,
-                verticalOverflow = element.scrollHeight <= element.clientHeight,
+            var scrollDirections = {element:element,horizontal:false,vertical:false},
+                horizontalOverflow = element.scrollWidth > element.clientWidth,
+                verticalOverflow = element.scrollHeight > element.clientHeight,
                 computedStyle;
             if (!horizontalOverflow&&!verticalOverflow) {
               return scrollDirections;
