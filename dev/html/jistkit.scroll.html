@@ -15,6 +15,8 @@
           startY: -1,
           startX: -1,
           tree: null,
+          verticalDistance: 0,
+          horizontalDistance: 0,
           attach: function () {
             window.addEventListener("touchstart",this,true)
             window.addEventListener("touchend",this,true)
@@ -22,34 +24,32 @@
             window.addEventListener("touchmove",this,true)     
           },
           handleEvent: function (event) {
-
             switch(event.type) {
               case "touchmove": return this.handleTouchMove(event);
               case "touchstart": return this.handleTouchStart(event);
-              case "touchend":
-              case "touchcancel": return this.handleTouchFinish(event);
             }
           },
           handleTouchMove: function (event) {
             if (event.touches.length==1 && this.eventChain.length) {
-              if (this.startY != -1) {
-                var verticalDirection = event.touches[0].pageY-this.startY,
-                    horizontalDirection = event.pageX-this.startX;
-                for (var chain = this.eventChain,
-                        i=chain.length-1,
-                        element,
-                        scrollWidth,
-                        scrollLeft,
-                        clientWidth;
-                        i!=-1;
-                        i--) {
+              if (this.startY != -1 || this.startX !=-1) {
+                this.verticalDistance = event.touches[0].pageY-this.startY,
+                this.horizontalDistance = event.pageX-this.startX;
+                for (var chain = this.eventChain,i=chain.length-1,element;i!=-1;i--) {
                     element = chain[i].element;
                     if (chain[i].vertical && element.scrollHeight > element.clientHeight) {
                         if (
-                              (verticalDirection > 0 && element.scrollTop > 0) ||
-                              (verticalDirection < 0 && element.scrollTop < element.scrollHeight - element.clientHeight)
+                              (this.verticalDistance > 0 && element.scrollTop > 0) ||
+                              (this.verticalDistance < 0 && element.scrollTop < element.scrollHeight - element.clientHeight)
                             ) {
                           return;
+                        }
+                    }
+                    if (chain[i].horizontal && element.scrollWidth > element.clientWidth) {
+                        if (
+                          (this.horizontalDistance > 0 && element.scrollLeft > 0) ||
+                          (this.horizontalDistance < 0 && element.scrollLeft < element.scrollWidth - element.clientWidth)
+                        ) {
+                            return;
                         }
                     }
                 }
@@ -60,23 +60,21 @@
           },
           handleTouchStart: function (event) {
             if (event.touches.length==1) {
-              this.eventChain.length = 0;
-              this.startY = event.touches[0].pageY;
-              this.startX = event.touches[0].pageX;
-              var currentNode = event.target;
-              for (var scrollDetails;currentNode && currentNode!=document.body && currentNode!= document.documentElement;currentNode=currentNode.parentNode) {
+                this.started =true;
+                this.eventChain.length = 0;
+                this.startY = event.touches[0].pageY;
+                this.startX = event.touches[0].pageX;
+                delete this.verticalDistance;
+                delete this.horizontalDistance;
+                var currentNode = event.target;
+                for (var scrollDetails;currentNode && currentNode!=document.body && currentNode!= document.documentElement;currentNode=currentNode.parentNode) {
                     scrollDetails = this.getElementScrollingDetails(currentNode)
                     if (scrollDetails.vertical||scrollDetails.horizontal) {
                         this.eventChain.push(scrollDetails);
                     }
-              }
+                }
             }
-          },
-          handleTouchFinish: function () {
-            this.eventChain.length = 0;
-            delete this.startX;
-            delete this.startY;
-          },
+        },
           getElementScrollingDetails: function (element) {
             var scrollDirections = {element:element,horizontal:false,vertical:false},
                 horizontalOverflow = element.scrollWidth > element.clientWidth,
