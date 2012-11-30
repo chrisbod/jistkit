@@ -6,107 +6,76 @@ JistKit.createType(JistKit.Sections,"sections",JistKit,{
     sectionElementClassName: "jistkit-section",
     split: function () {
         var element = this.element,
-            containerRectangle,
-            rectangles,
             sections;
         element.classList.add(this.sectionContainerClassName);
-        this.boundingClientRect = element.getBoundingClientRect()
-        sections =  this.splitIntoSections(element.childNodes);
-        element.appendChild(sections)
+        sections =  this.splitIntoSections(element.childNodes,element.getBoundingClientRect().bottom);
+        element.appendChild(sections);
         element.classList.remove(this.sectionContainerClassName)
         return sections;
     },
-    nodeOverflows: function (node,bottom) {
-
+    nodeOverflows: function (range,node,bottom) {
         if (node.getBoundingClientRect) {
             return node.getBoundingClientRect().bottom>bottom;
         }
-        var range = document.createRange()
-        range.selectNode(node)
+        range.selectNode(node);
         return range.getBoundingClientRect().bottom>bottom;
     },
-    splitIntoSections: function (childNodes) {
-        var boundingRectangle = this.element.getBoundingClientRect(),
-            bottom = this.boundingClientRect.bottom,
-            elementToSplit,
-            range = document.createRange()
-        var sections = document.createDocumentFragment();
+    splitIntoSections: function (childNodes,bottom) {
+        var range = document.createRange(),
+            sections = document.createDocumentFragment();
         for (var child=childNodes[0];child;child=child.nextSibling) {
-
-            if (this.nodeOverflows(child,bottom)) {
-                sections.appendChild(this.splitToFit(child))
+            if (this.nodeOverflows(range,child,bottom)) {
+                sections.appendChild(this.splitToFit(range,child,bottom))
             }
         }
         if (this.element.childNodes.length) {
             range.selectNodeContents(this.element);
-            var section = document.createElement("section")
-            section.classList.add(this.sectionElementClassName)
-            section.appendChild(range.extractContents())
-            sections.appendChild(section)
+            sections.appendChild(this.getSectionFromRange(range))
         }
         range.detach()
         return sections;
     },
-    splitToFit: function (element) {
-
-        var range = document.createRange()
-        var bottom = this.boundingClientRect.bottom;
+    splitToFit: function (range,element,bottom) {
         range.selectNode(element);
-
-        var section = this.getSection(range,element,bottom)
-        range.detach();
-        return section
+        return this.getSection(range,element,bottom)
     },
     getSection: function (range,element,bottom) {
-        var fragment = document.createDocumentFragment()
+        var fragment = document.createDocumentFragment();
         var currentNode = element.lastChild||element;
-        //console.log(element.textContent.length)
         if (currentNode.nodeType!=1) {//text node>?
-            var startPos = currentNode.textContent.length;
-            while (startPos) {
-                range.setEnd(currentNode,--startPos)
-                var rects = range.getClientRects();
-                if (rects[rects.length-1].bottom<=bottom) {
-                    range.setEnd(currentNode,startPos)
-                    break;
-                } 
-            }
+            this.contractRangeToFit(range,currentNode,currentNode.textContent.length,bottom)
             range.setStart(this.element)
-  
-            
-            var section = document.createElement("section")
-            section.classList.add(this.sectionElementClassName)
-            section.appendChild(range.extractContents());
-            fragment.appendChild(section)
+            fragment.appendChild(this.getSectionFromRange(range))
             if (element.nodeType!=1) {
                 fragment.appendChild(this.getNextTextSection(range,element,bottom))
             }
             return fragment;
         } else {//need to split the node
-
+            throw new Error("Unsupported node")
             return element
         }
     },
     getNextTextSection: function (range,textNode,bottom) {
-            var startPos = textNode.textContent.length;
             range.selectNode(textNode);
-            while (startPos) {
-                range.setEnd(textNode,--startPos)
-                var rects = range.getClientRects();
-                if (rects[rects.length-1].bottom<=bottom) {
-                    range.setEnd(textNode,startPos)
-                    break;
-                } 
-            }
-            var section = document.createElement("section")
-            section.classList.add(this.sectionElementClassName)
-            section.appendChild(range.extractContents()); 
-            return section
-        
-            
-            
-
-        //}
+            this.contractRangeToFit(range,textNode,textNode.textContent.length,bottom)
+            return this.getSectionFromRange(range);
+    },
+    contractRangeToFit: function (range,node,startPosition,bottom) {
+        while (startPosition) {
+            range.setEnd(node,--startPosition)
+            var rects = range.getClientRects();
+            if (rects[rects.length-1].bottom<=bottom) {
+                range.setEnd(node,startPosition)
+                break;
+            } 
+        }
+        return range;
+    },
+    getSectionFromRange: function (range) {
+        var section = document.createElement("section")
+        section.classList.add(this.sectionElementClassName)
+        section.appendChild(range.extractContents());
+        return section;
     }
 
 })
