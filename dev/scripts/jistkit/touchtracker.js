@@ -14,8 +14,7 @@ JistKit.TouchTracker = function TouchTracker(target) {
 	}
 	this.touchHistory = [];
 }
-JistKit.TouchTracker.prototype = new JistKit();
-JistKit.extendFromLiteral(JistKit.TouchTracker,{
+JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	cancelClickDistance: 40,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
 	currentDistance: 0,
 	target: this,//defaults to the window object for adding event listeners
@@ -118,8 +117,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 			}
 			if (this.trackTouchHistory) {
 				this.trackTouch(touchStartEvent.timeStamp,touch)
-			}
-	
+			}	
 			if (this.touchhold) {
 				this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent]);
 			}
@@ -194,9 +192,13 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		}
 	},
 	trackTouch: function touchTracker_trackTouch(time,touch) {
-		return this.touchHistory.push({timeStamp:time,clientX:touch.clientX,clientY:touch.clientY})
+		return this.touchHistory.push({
+			timeStamp: time,
+			clientX: touch.clientX,
+			clientY: touch.clientY
+		})
 	},
-	touchIsInsideTolerance: function touchTracker_insideTolerance() {
+	touchIsInsideTolerance: function touchTracker_touchIsInsideTolerance() {
 		var x = this.currentX-this.startX,
 			y = this.currentY-this.startY;
 		return this.cancelClickDistance > Math.sqrt((x*x)+(y*y));
