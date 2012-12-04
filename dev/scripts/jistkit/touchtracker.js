@@ -3,7 +3,12 @@
 //TODO: actually implement the custom touchmove event
 //TODO: add swipe and flick support
 //TODO: add touchout event (will only fire on the target element not any others)
-//TODO: decide whether there should be a touchmovehold event (probably should be)
+//TODO: decide whether there should be a touchmovehold/pause event
+//TODO: provide a lastTouchEvent that returns the last native touchevent that occured
+//TODO: decide whether listen to click events ONLY when needed (probably excessive)
+//TODO: check to see if any of the flags are redundant (I think active probably isnt anymore)
+//TODO: look into touchcancel and touchleave events...
+//TODO: doubletap events...
 
 JistKit.TouchTracker = function TouchTracker(target) {
 	if (target instanceof JistKit) {
@@ -50,7 +55,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 	//other instance properties used by object so handle with care (better yet don't handle at all!)
 	touch: null,//the touch that is currently being tracked
 	touchList: null,//a collection of touch 'positions' tracked so far
-	currentElement: null, //the target element of the touch events
+	eventTarget: null, //the target element of the touch events
 	//begin methods
 
 
@@ -71,8 +76,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 					case "touchmove": this.moveTouch(event); break;
 					case "touchend" : this.endTouch(event); break;	
 					case "click": if (this.clicked) {
-						event.stopPropagation();
-						event.preventDefault()
+						this.cancelClickEvent(event);
 					}
 				}
 			} else {
@@ -82,12 +86,16 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 			}
 		}
 	},
+	cancelClickEvent: function touchTracker_cancelClickEvent(event) {
+		event.stopPropagation();
+		event.preventDefault()
+		delete this.clicked;
+	},
 	attachToTarget: function touchTracker_attachToTarget(touchStartEvent) {
 		this.target.addEventListener("touchend", this,true);
 		this.target.addEventListener("click", this,true);
 		this.target.addEventListener("touchmove", this,true);
-		this.currentElement = touchStartEvent.target;
-		this.clicked = false;
+		this.eventTarget = touchStartEvent.target;
 		this.touchStartEvent = touchStartEvent;
 		this.touch = touchStartEvent.touches[0];
 		this.active = true;
@@ -96,6 +104,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		this.target.removeEventListener("touchend", this);
 		this.target.removeEventListener("click", this);
 		this.target.removeEventListener("touchmove", this);
+		this.touchList.length = 0;
 		delete this.clicked;
 		delete this.moving;
 		delete this.active;
@@ -103,12 +112,12 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		delete this.currentX;
 		delete this.currentY;
 		delete this.touch;
-		this.touchList.length = 0;
+		delete this.eventTarget;
 	},
 	startTouch: function touchTracker_startTouch(touchStartEvent) {
 		var touch;
 		if (touchStartEvent.changedTouches.length==1) {
-			if (!this.active) {
+			if (!this.active) {//do we still need this?
 				touch = touchStartEvent.changedTouches[0];
 				if (this.recordTouches) {
 					this.recordTouch(touchStartEvent.timeStamp,touch)
@@ -117,7 +126,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 				this.startY = this.currentY = touch.clientY;
 				this.attachToTarget(touchStartEvent);
 				if (this.touchhold) {
-					this.setScopedTimeout(this.checkForTouchHold,this.pressLength);
+					this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay);
 				}
 				if (this.touchstart) {
 					this.dispatchTouchStart(touchStartEvent);
@@ -142,24 +151,28 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		}
 	},
 	endTouch: function touchTracker_endTouch(touchEndEvent) {
-		var touch = this.touch;
+		var touch = this.touch,
+			tapEvent,
+			fastdomclick = this.fastdomclick;
 		this.currentX = touch.clientX;
 		this.currentY = touch.clientY;
 		if (this.recordTouches) {
-			this.recordTouch(touchEndEvent.timeStamp,touch)
+			this.recordTouch(touchEndEvent.timeStamp,touch);
 		};
 		if (!this.held && this.active && this.insideTolerance()) {
 			if (this.touchtap) {
-				var tap = this.dispatchTouchTap(touchEndEvent);
+				if (this.dispatchTouchTap(touchEndEvent).defaultPrevented) {
+					fastdomclick = false;
+				}
 			}
-			if (this.fastdomclick) {
+			if (fastdomclick) {
 				this.dispatchDOMClick(touchEndEvent);
 			}
 		}
 		if (this.touchend) {
 			this.dispatchTouchEnd(touchEndEvent);
 		}
-		this.detachFromTarget(touchEndEvent);
+		this.detachFromTarget();
 	},
 	checkForTouchHold: function touchTracker_checkForTouchHold() {
 		if (this.active && this.insideTolerance()) {
@@ -169,7 +182,6 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 			}
 		}
 	},
-
 	recordTouch: function touchTracker_recordTouch(time,touch) {
 		return this.touchList.push({timeStamp:time,clientX:touch.clientX,clientY:touch.clientY})
 	},
@@ -183,11 +195,11 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 
 	dispatchDOMClick: function touchTracker_simulateClick(touchEndEvent) {
 		 this.clicked = true;
+		 this.moving = false;
 		 var evt = document.createEvent("MouseEvents");
 		 evt.initMouseEvent("click", true, true, window, touchEndEvent.detail, touchEndEvent.screenX, touchEndEvent.screenY, touchEndEvent.clientX, touchEndEvent.clientY, false, false, false, false, 0, null);
 		 evt.touchEvent = touchEndEvent;
-		 this.currentElement.dispatchEvent(evt);
-		 this.moving = false;
+		 this.eventTarget.dispatchEvent(evt);
 		 return evt;
 	},
 	dispatchTouchStart: function touchTracker_dispatchTouchStart(touchStartEvent) {
@@ -195,7 +207,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 			touch = touchStartEvent.touches[0];
 		evt.initMouseEvent("jistkit.touchstart", true, true, window, touchStartEvent.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 		evt.touchEvent = touchStartEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	},
 	dispatchTouchMoveStart: function touchTracker_dispatchTouchMoveStart(touchMoveEvent) {
@@ -203,7 +215,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		touch = touchMoveEvent.touches[0];
 		evt.initMouseEvent("jistkit.touchmovestart", true, true, window, touchMoveEvent.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 		evt.touchEvent = touchMoveEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	},
 	dispatchTouchEnd: function touchTracker_dispatchTouchEnd(touchEndEvent) {
@@ -215,21 +227,21 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 		evt.touchMoveSpeed = 1000*Math.sqrt(x*x+y*y)/(touchEndEvent.timeStamp-this.touchStartEvent.timeStamp);
 		evt.touchList = this.touchList.concat();
 		evt.touchEvent = touchEndEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	},
 	dispatchTouchHold: function touchTracker_dispatchTouchHold (touchStartEvent) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("jistkit.touchhold", true, true, window, touchStartEvent.detail, touchStartEvent.screenX, touchStartEvent.screenY, touchStartEvent.clientX, touchStartEvent.clientY, false, false, false, false, 0, null);
 		evt.touchEvent = touchStartEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	},
 	dispatchTouchTap: function touchTracker_dispatchTouchHold (touchEndEvent) {
 		var evt = document.createEvent("MouseEvents");
 		evt.initMouseEvent("jistkit.touchtap", true, true, window, event.detail, event.screenX, event.screenY, event.clientX, event.clientY, false, false, false, false, 0, null);
 		evt.touchEvent = touchEndEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	},
 	dispatchTouchChange: function touchTracker_dispatchTouchStart(touchStartEvent) {
@@ -237,7 +249,7 @@ JistKit.extendFromLiteral(JistKit.TouchTracker,{
 			touch = touchStartEvent.touches[0];
 		evt.initMouseEvent("jistkit.touchchange", true, true, window, touchStartEvent.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 		evt.touchEvent = touchStartEvent;
-		this.currentElement.dispatchEvent(evt);
+		this.eventTarget.dispatchEvent(evt);
 		return evt;
 	}
 });
