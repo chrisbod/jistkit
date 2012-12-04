@@ -15,7 +15,7 @@ JistKit.TouchTracker = function TouchTracker(target) {
 	this.touchHistory = [];
 }
 JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
-	cancelClickDistance: 40,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
+	cancelClickDistance: 50,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
 	currentDistance: 0,
 	target: this,//defaults to the window object for adding event listeners
 	captureEvents: true,//determines event flow
@@ -126,7 +126,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		}
 	},
 	moveTouch: function touchTracker_moveTouch(touchMoveEvent) {
-		var touch = touchMoveEvent.changedTouches[0];
+		var touch = touchMoveEvent.touches[0];
 		this.currentX = touch.clientX;
 		this.currentY = touch.clientY;
 		if (this.trackTouchHistory) {
@@ -159,13 +159,14 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	endTouch: function touchTracker_endTouch(touchEndEvent) {
 		var touch = this.touch,
 			tapEvent,
-			fastdomclick = this.fastdomclick;
+			fastdomclick = this.fastdomclick,
+			insideTolerance = this.touchIsInsideTolerance();
 		this.currentX = touch.clientX;
 		this.currentY = touch.clientY;
 		if (this.trackTouchHistory) {
 			this.trackTouch(touchEndEvent.timeStamp,touch);
 		};
-		if (!this.held && this.touchIsInsideTolerance()) {
+		if (!this.held && insideTolerance) {
 			if (this.touchtap) {
 				if (this.dispatchTouchEvent(this.touchtapEvent,touchEndEvent).defaultPrevented) {
 					fastdomclick = false;
