@@ -1,10 +1,12 @@
-//TODO: move property 'resets' in detach from target to a reset method
 //TODO: decide whether there should be a touchmovehold/pause event
 //TODO: look into touchcancel and touchleave events...
 //TODO: doubletap events...?
 //TODO: decide whether the move start event is useful (and check the logic too!)
 //TODO: edit the comments to explain the use of Aspect Ratios better
-//TODO: fix the innerHeight and innerWidth problem with getBounding client Rect
+//TODO: fix the innerHeight and innerWidth problem with getBounding client Rect / orientation
+//TODO decide about whether to have a flickAngle property
+//TODO: decide whether the flick method needs breaking up for clarity (and inheritance etc)
+//TODO: decide whether to use function.bind for scoped timeout (in JistKit actually)
 
 JistKit.TouchTracker = function TouchTracker(target) {
 	if (target instanceof JistKit) {
@@ -56,6 +58,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	currentX: -1,
 	currentY: -1,
 	touchIsOutside: false,
+	flickSpeed: 0, //pixels per second - 0 except during a flick event - use touchHistory or startX/startY/currentX,currentY in other circumstances
 
 	//other instance properties used by object so handle with care (better yet don't handle at all!)
 	touchHistory: null,//a collection of touch 'positions' tracked so far 
@@ -128,13 +131,14 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		delete this.startY;
 		delete this.startTime;
 		delete this.touchIsOutside;
-		delete this.endTime; 
+		delete this.endTime;
+		delete this.flickVelocity;
 	},
 	startTouch: function touchTracker_startTouch(touchStartEvent) {
 		var touch = touchStartEvent.touches[0];
 		if (touchStartEvent.touches.length==1) {
 			this.attachToTarget(touchStartEvent);
-			this.trackTouch(touchStartEvent.timeStamp, touch.clientX, touch.clientY);
+			var startTouch = this.trackTouch(touchStartEvent.timeStamp, touch.clientX, touch.clientY);
 			this.eventTarget = touchStartEvent.target;
 			this.startX = this.currentX = touch.clientX;
 			this.startY = this.currentY = touch.clientY;
@@ -144,7 +148,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 			}
 			this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY);
 			if (this.touchhold) {
-				this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent]);
+				this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent,startTouch]);
 			}
 		} else if (this.touchchange) {
 			this.dispatchTouchEvent(this.changeEvent,touchStartEvent);
@@ -202,11 +206,12 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.detachFromTarget();
 		this.reset();
 	},
-	checkForTouchHold: function touchTracker_checkForTouchHold(touchStartEvent) {
-		if (this.touchStartEvent == touchStartEvent && this.touchIsInsideTolerance()) {
+	checkForTouchHold: function touchTracker_checkForTouchHold(touchStartEvent,touchStart) {
+		if (this.touchHistory[0] == touchStart && this.touchIsInsideTolerance()) {
 			this.held = true;
 			if (this.touchhold) {
-				this.dispatchTouchEvent(this.holdEvent,this.touchStartEvent);
+				this.dispatchTouchEvent(this.holdEvent,touchStartEvent);
+				window.addEventListener("click",this,true);
 			}
 		}
 	},
@@ -216,8 +221,9 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 				y = this.currentY-this.startY,
 				aspect = this.getDeviceAspectRatio(),
 				distance = Math.sqrt((x*x)+(y*y)),
-				time = (this.endTime-this.startTime)/1000;
-			if (distance >= this.flickMinimumDistance*aspect && distance/time >= this.flickMinimumSpeed) {
+				time = (this.endTime-this.startTime)/1000,
+				flickSpeed = this.flickSpeed = distance/time;
+			if (distance >= this.flickMinimumDistance*aspect && flickSpeed>= this.flickMinimumSpeed) {
 				var degrees = Math.atan2(-x,-y)*180/Math.PI,
 					landscape = aspect>1,
 					verticalTolerance = landscape? 45 : 45/aspect,
@@ -245,11 +251,13 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		}
 	},
 	trackTouch: function touchTracker_trackTouch(time,clientX,clientY) {
-		return this.touchHistory.push({
+		var touchDetails = {
 			timeStamp: time,
 			clientX: clientX,
 			clientY: clientY
-		});
+		}
+		this.touchHistory.push(touchDetails);
+		return touchDetails;
 	},
 	touchIsInsideTolerance: function touchTracker_touchIsInsideTolerance() {
 		var x = this.currentX-this.startX,
