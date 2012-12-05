@@ -4,8 +4,6 @@
 //TODO: decide whether the move start event is useful (and check the logic too!)
 //TODO: edit the comments to explain the use of Aspect Ratios better
 //TODO: fix the innerHeight and innerWidth problem with getBounding client Rect / orientation
-//TODO decide about whether to have a flickAngle property
-//TODO: decide whether the flick method needs breaking up for clarity (and inheritance etc)
 //TODO: decide whether to use function.bind for scoped timeout (in JistKit actually)
 
 JistKit.TouchTracker = function TouchTracker(target) {
@@ -18,7 +16,7 @@ JistKit.TouchTracker = function TouchTracker(target) {
 	this.touchHistory = [];
 };
 JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
-	cancelClickDistance: 50,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
+	cancelClickDistance: 30,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
 	currentDistance: 0,
 	target: this,//defaults to the window object for adding event listeners
 	disabled: false,//can be set at any time and will prevent the object from responding to ANY events (does not detach it)
@@ -29,7 +27,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	
 	touchstart: true,//determines whether a jistkit.touchstart event is fired
 	touchmove: false,//set to true for touch move events - disabled by default for performance
-	touchmovestart: true,//fires when the touch has moved further than the cancel click distance - use native touch move for immediated tracking
+	touchmoveconfirm: false,//fires when the touch has moved further than the cancel click distance - use native touch move for immediated tracking
 	touchchange: true,//fires if additional fingers are added to the touch - if this occurs the tracker will no longer report any events - TODO make this a flag
 	touchhold: true,//whether you want a longpress/gold event to fire (remember to use CSS to disable default behaviours..)
 	touchholdDelay: 750,//determines how long a user needs to press for it to be considered a long press(hold)
@@ -51,8 +49,8 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 
 	//state 'flags' - changing these outside the object could create much fun
 
+	touchmoveConfirmed:false,
 	activated: false,
-	touchWithinTolerance: false,
 	clicked: false,
 	held: false,
 	currentX: -1,
@@ -66,7 +64,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	
 	//touchevent names
 	startEvent: "jistkit.touch.start",
-	startmoveEvent: "jistkit.touch.startmove",
+	touchmoveconfirmEvent: "jistkit.touch.moveconfirm",
 	moveEvent: "jistkit.touch.move",
 	inEvent: "jistkit.touch.in",
 	outEvent:"jistkit.touch.out",
@@ -113,7 +111,8 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	},
 	attachToTarget: function touchTracker_attachToTarget() {
 		this.target.addEventListener("touchend", this,true);
-		this.target.addEventListener("touchmove", this,true);		
+		this.target.addEventListener("touchmove", this,true);
+		window.addEventListener("click",this,true);		
 	},
 	detachFromTarget: function touchTracker_detachFromTarget() {
 		this.target.removeEventListener("touchend", this, true);
@@ -122,7 +121,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	reset: function touchTracker_reset() {
 		this.touchHistory.length = 0;//NOTE: the same array is always used
 		delete this.clicked;
-		delete this.touchWithinTolerance;
+		delete this.touchmoveConfirmed;
 		delete this.held;
 		delete this.currentX;
 		delete this.currentY
@@ -147,9 +146,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 				this.dispatchTouchEvent(this.startEvent,touchStartEvent);
 			}
 			this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY);
-			if (this.touchhold) {
-				this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent,startTouch]);
-			}
+			this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent,startTouch]);
 		} else if (this.touchchange) {
 			this.dispatchTouchEvent(this.changeEvent,touchStartEvent);
 		}
@@ -172,12 +169,13 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 				}
 			}
 		}
-		if (this.touchIsInsideTolerance()) {
-			this.touchWithinTolerance = false;
-		} else if (!this.touchWithinTolerance && this.touchmovestart) {
-			this.touchWithinTolerance = true;
-			this.dispatchTouchEvent(this.moveEvent,touchMoveEvent);
-		} else if (this.touchmove) {
+		if (!this.touchmoveConfirmed && !this.touchIsInsideTolerance()) {
+			this.touchmoveConfirmed = true;
+			if (this.touchmoveconfirm) {	
+				this.dispatchTouchEvent(this.touchmoveconfirmEvent,touchMoveEvent);
+			}
+		}
+		if (this.touchmove) {
 			this.dispatchTouchEvent(this.moveEvent,touchMoveEvent);
 		}
 	},
@@ -187,7 +185,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.currentY = touchEndEvent.changedTouches[0].clientY;
 		this.endTime = touchEndEvent.timeStamp;
 		this.trackTouch(touchEndEvent.timeStamp,touchEndEvent.clientX,touchEndEvent.clientY);
-		if (!this.held && this.touchIsInsideTolerance()) {
+		if (!this.touchIsStale() && this.touchIsInsideTolerance()) {
 			if (this.touchtap) {
 				if (this.dispatchTouchEvent(this.tapEvent,touchEndEvent).defaultPrevented) {
 					fastdomclick = false;
@@ -207,13 +205,12 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.reset();
 	},
 	checkForTouchHold: function touchTracker_checkForTouchHold(touchStartEvent,touchStart) {
-		if (this.touchHistory[0] == touchStart && this.touchIsInsideTolerance()) {
-			this.held = true;
-			if (this.touchhold) {
-				this.dispatchTouchEvent(this.holdEvent,touchStartEvent);
-				window.addEventListener("click",this,true);
-			}
+		if (this.touchhold && this.touchHistory[0] == touchStart && this.touchIsInsideTolerance()) {
+			this.dispatchTouchEvent(this.holdEvent,touchStartEvent);
 		}
+	},
+	touchIsStale: function touchTracker_touchIsStale() {
+		return Date.now()-this.startTime>(this.touchholdDelay/1.1);
 	},
 	checkForFlicks: function touchTracker_checkForFlicks(touchEndEvent) {
 		if (this.flick||this.flickleft||this.flickright||this.flickup||this.flickdown) {
