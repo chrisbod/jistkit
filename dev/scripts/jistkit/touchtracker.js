@@ -5,6 +5,8 @@
 //TODO: look into touchcancel and touchleave events...
 //TODO: doubletap events...?
 //TODO: decide whether the move start event is useful (and check the logic too!)
+//TODO: edit the comments to explain the use of Aspect Ratios better
+//TODO: fix the innerHeight and innerWidth problem with getBounding client Rect
 
 JistKit.TouchTracker = function TouchTracker(target) {
 	if (target instanceof JistKit) {
@@ -20,7 +22,6 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	currentDistance: 0,
 	target: this,//defaults to the window object for adding event listeners
 	captureEvents: true,//determines event flow
-	trackTouchHistory: false,//when set to true you have a list of objects with coords and times set for the path travelled by the touch
 	disabled: false,//can be set at any time and will prevent the object from responding to ANY events (does not detach it)
 
 
@@ -39,20 +40,19 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchout: false,//ALSO means that touchin events can fire if the user returns to the element,should fire when the touch leaves the element the tracker is bound to...it does NOT effect any event tracking merely sends the message
 	touchtap: true,//determines whether a jistkit.tap is fired (this occurs before a fast click is dispatched, preventing default will stop the fast click to be sent)
 
-	flick: false, //generic flicks fire at ANY angle
+	flick: false, //generic flick -  fires at ANY angle
 	flickleft: false, //see thresholds/tolerances below
 	flickright: false,
 	flickup: false,
 	flickdown: false,
 
-	//some of these are probably going to be redundant...
-	flickHorizontalTolerance: 30, //max degrees from the x axis that will fire a horizontal flick (flickleft/flickreight)
-	flickVerticalTolerance: 30, //max degrees from the x axis that will fire a vertical flick (flickleft/flickreight)
-	flickMinimumDistance: 60, //minimum distance (px) that must be travelled by the touch to trigger a flick
-	flickMinimumSpeed: 1000, //minimum speed (px/s) the touch should be moving to trigger a flick
+	//some of these are probably going to be redundant..
+	//IMPORTANT these values are used WITH the aspect ratio taken into account
+	//if you want to use 1:1 ratio over ride the getRawAspectRatio method to return 1
+	flickMinimumDistance: 75, //minimum distance (px) that must be travelled by the touch to trigger a flick
+	flickMinimumSpeed: 500, //minimum speed (px/s) the touch should be moving to trigger a flick
 
-
-	//state 'flags' TODO make readonly...
+	//state 'flags' - changing these outside the object could create much fun
 
 	activated: false,
 	moving: false,
@@ -63,10 +63,8 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchIsOutside: false,
 
 	//other instance properties used by object so handle with care (better yet don't handle at all!)
-	touchHistory: null,//a collection of touch 'positions' tracked so far (if trackTouchHistory is set to trueth)
+	touchHistory: null,//a collection of touch 'positions' tracked so far 
 	eventTarget: null, //the target element of the touch events
-	touchStartEvent: null,//the DOM event that started the current touch
-	touchMoveEvent: null,//the last move event that has fired
 	
 	//touchevent names
 	startEvent: "jistkit.touch.start",
@@ -126,23 +124,20 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.clicked = this.moving = this.held = false;
 		this.currentX = this.currentY = -1;
 		this.eventTarget = null;
-		this.touchMoveEvent = null;
-		this.touchStartEvent = null;
 	},
 	startTouch: function touchTracker_startTouch(touchStartEvent) {
 		var touch = touchStartEvent.touches[0];
 		if (touchStartEvent.touches.length==1) {
 			this.attachToTarget(touchStartEvent);
-			this.touchStartEvent = touchStartEvent;
+			this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY);
 			this.eventTarget = touchStartEvent.target;
 			this.startX = this.currentX = touch.clientX;
-			this.startY = this.currentY = touch.clientY;		
+			this.startY = this.currentY = touch.clientY;
+			this.startTime = touchStartEvent.timeStamp;		
 			if (this.touchstart) {
 				this.dispatchTouchEvent(this.startEvent,touchStartEvent);
 			}
-			if (this.trackTouchHistory) {
-				this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY)
-			}	
+			this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY)
 			if (this.touchhold) {
 				this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent]);
 			}
@@ -154,21 +149,17 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		var touch = touchMoveEvent.touches[0];
 		this.currentX = touch.clientX;
 		this.currentY = touch.clientY;
-		if (this.trackTouchHistory) {
-			this.trackTouch(touchMoveEvent.timeStamp,touch);
-		}
-		this.touchMoveEvent = touchMoveEvent;
+		this.trackTouch(touchMoveEvent.timeStamp,this.currentX,this.currentY);
 		if (this.touchout) {
-			var outside = this.touchIsOutsideTarget();
-			if (outside) {
+			if (this.touchIsOutsideTarget()) {
 				if (!this.touchIsOutside) {
 					this.touchIsOutside = true;
-					this.dispatchTouchEvent(this.touchoutEvent,touchMoveEvent,false);
+					this.dispatchTouchEvent(this.outEvent,touchMoveEvent,false);
 				}
 			} else {
 				if (this.touchIsOutside) {
 					this.touchIsOutside = false;
-					this.dispatchTouchEvent(this.touchinEvent,touchMoveEvent,false);
+					this.dispatchTouchEvent(this.inEvent,touchMoveEvent,false);
 				}
 			}
 		}
@@ -184,14 +175,12 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	},
 	endTouch: function touchTracker_endTouch(touchEndEvent) {
 		var	tapEvent,
-			fastdomclick = this.fastdomclick,
-			insideTolerance = this.touchIsInsideTolerance();
-		this.currentX = touchEndEvent.clientX;
-		this.currentY = touchEndEvent.clientY;
-		if (this.trackTouchHistory) {
-			this.trackTouch(touchEndEvent.timeStamp,touchEndEvent.clientX,touchEndEvent.clientY);
-		};
-		if (!this.held && insideTolerance) {
+			fastdomclick = this.fastdomclick;
+		this.currentX = touchEndEvent.changedTouches[0].clientX;
+		this.currentY = touchEndEvent.changedTouches[0].clientY;
+		this.endTime = touchEndEvent.timeStamp;
+		this.trackTouch(touchEndEvent.timeStamp,touchEndEvent.clientX,touchEndEvent.clientY);
+		if (!this.held && this.touchIsInsideTolerance()) {
 			if (this.touchtap) {
 				if (this.dispatchTouchEvent(this.tapEvent,touchEndEvent).defaultPrevented) {
 					fastdomclick = false;
@@ -207,6 +196,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		if (this.touchend) {
 			this.dispatchTouchEvent(this.endEvent,touchEndEvent);
 		}
+		this.checkForFlick(touchEndEvent);
 		this.detachFromTarget();
 	},
 	checkForTouchHold: function touchTracker_checkForTouchHold(touchStartEvent) {
@@ -215,6 +205,51 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 			if (this.touchhold) {
 				this.dispatchTouchEvent(this.holdEvent,this.touchStartEvent);
 			}
+		}
+	},
+	checkForFlick: function touchTracker_checkForFlick(touchEndEvent) {
+		if (this.flick||this.flickleft||this.flickright||this.flickup||this.flickdown) {
+			var startX = this.startX,
+				startY = this.startY,
+				endX = this.currentX,
+				endY = this.currentY,
+				x = endX-startX,
+				y = (endY-startY),
+				aspect = this.getDeviceAspectRatio(),
+				distance = Math.sqrt((x*x)+(y*y)),
+				time = (this.endTime-this.startTime)/1000;
+			if (distance >= this.flickMinimumDistance*aspect && distance/time >= this.flickMinimumSpeed) {
+				var degrees = Math.atan2(-x,-y)*180/Math.PI,
+					landscape = aspect>1,
+					verticalTolerance = landscape? 45 : 45/aspect,
+					horizontalTolerance = landscape? 45/aspect : 45;
+				if (this.flick) {
+					if (this.dispatchTouchEvent(this.flickEvent,touchEndEvent).defaultPrevented) {
+						return;
+					};
+				}
+				if (this.flickleft && (degrees>0 && degrees<90+horizontalTolerance && degrees>90-horizontalTolerance)) {
+					this.dispatchTouchEvent(this.leftEvent,touchEndEvent);
+				}
+				if (this.flickright && (degrees<0 && degrees<-90+horizontalTolerance && degrees>-90-horizontalTolerance)) {
+					this.dispatchTouchEvent(this.rightEvent,touchEndEvent);
+				}
+				if (this.flickup && Math.abs(degrees)<verticalTolerance) {
+					this.dispatchTouchEvent(this.upEvent,touchEndEvent);
+				}
+				if (this.flickdown && Math.abs(degrees)>180-verticalTolerance) {
+					this.dispatchTouchEvent(this.downEvent,touchEndEvent);
+				}
+				
+			}
+			
+			
+				
+
+			/*flickHorizontalTolerance: 30, //max degrees from the x axis that will fire a horizontal flick (flickleft/flickright)
+			flickVerticalTolerance: 30, //max degrees from the x axis that will fire a vertical flick (flickleft/flickright)*/
+			
+
 		}
 	},
 	trackTouch: function touchTracker_trackTouch(time,clientX,clientY) {
@@ -239,7 +274,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		if (this.target.getBoundingClientRect) {
 			return this.target.getBoundingClientRect();//CAREFUL body and html (and other) elements won't auto expand to absolutely positioned stuff...
 		} else {
-			var rect = document.documentElement.getBoundingClientRect(),
+			return document.documentElement.getBoundingClientRect(),
 				height = Math.max(rect.height,window.innerHeight),
 				width = Math.max(rect.width,window.innerWidth);
 			return {
@@ -253,13 +288,19 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		}
 
 	},
-	dispatchTouchEvent: function touchTracker_dispatchTouchEvent(type,touchEvent,bubbles) {
+	dispatchTouchEvent: function touchTracker_dispatchTouchEvent(type,touchEvent,bubbles,dontDispatchYet) {
 		var event = document.createEvent("MouseEvents"),
-			touch = touchEvent.touches && touchEvent.touches.length? touchEvent.touches[0] : touchEvent;
+			touch = touchEvent.changedTouches ? touchEvent.changedTouches[0] : touchEvent;
 		event.initMouseEvent(type, bubbles == undefined ? true : bubbles, true, window, touchEvent.detail, touch.screenX, touch.screenY, touch.clientX, touch.clientY, false, false, false, false, 0, null);
 		event.touchEvent = touchEvent;
 		event.touchTracker = this;
-		this.eventTarget.dispatchEvent(event);
+		if (!dontDispatchYet) {
+			this.eventTarget.dispatchEvent(event);
+		}
 		return event;
+	},
+	getDeviceAspectRatio: function () {
+		//BEWARE orientation bugs...
+		return screen.width>screen.height ? screen.width/screen.height : screen.height/screen.width;
 	}
 });
