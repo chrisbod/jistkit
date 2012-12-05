@@ -45,7 +45,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 
 	//some of these are probably going to be redundant..
 	//IMPORTANT these values are used WITH the aspect ratio taken into account
-	//if you want to use 1:1 ratio over ride the getRawAspectRatio method to return 1
+	//if you want to use 1:1 ratio over ride the getDeviceAspectRatio method to return 1
 	flickMinimumDistance: 75, //minimum distance (px) that must be travelled by the touch to trigger a flick
 	flickMinimumSpeed: 500, //minimum speed (px/s) the touch should be moving to trigger a flick
 
@@ -202,7 +202,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		if (this.touchend) {
 			this.dispatchTouchEvent(this.endEvent,touchEndEvent);
 		}
-		this.checkForFlick(touchEndEvent);
+		this.checkForFlicks(touchEndEvent);
 		this.detachFromTarget();
 		this.reset();
 	},
@@ -215,39 +215,39 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 			}
 		}
 	},
-	checkForFlick: function touchTracker_checkForFlick(touchEndEvent) {
+	checkForFlicks: function touchTracker_checkForFlicks(touchEndEvent) {
 		if (this.flick||this.flickleft||this.flickright||this.flickup||this.flickdown) {
 			var x = this.currentX-this.startX,
 				y = this.currentY-this.startY,
 				aspect = this.getDeviceAspectRatio(),
-				distance = Math.sqrt((x*x)+(y*y)),
-				time = (this.endTime-this.startTime)/1000,
-				flickSpeed = this.flickSpeed = distance/time;
-			if (distance >= this.flickMinimumDistance*aspect && flickSpeed>= this.flickMinimumSpeed) {
-				var degrees = Math.atan2(-x,-y)*180/Math.PI,
-					landscape = aspect>1,
-					verticalTolerance = landscape? 45 : 45/aspect,
-					horizontalTolerance = landscape? 45/aspect : 45;
+				distance = Math.sqrt((x*x)+(y*y));
+			this.flickSpeed = distance/((this.endTime-this.startTime)/1000);
+			if (distance >= this.flickMinimumDistance*aspect && this.flickSpeed >= this.flickMinimumSpeed) {
 				if (this.flick) {
 					if (this.dispatchTouchEvent(this.flickEvent,touchEndEvent).defaultPrevented) {
 						return;
 					}
 				}
-				if (this.flickleft && (degrees>0 && degrees<90+horizontalTolerance && degrees>90-horizontalTolerance)) {
-					this.dispatchTouchEvent(this.leftEvent,touchEndEvent);
-				}
-				if (this.flickright && (degrees<0 && degrees<-90+horizontalTolerance && degrees>-90-horizontalTolerance)) {
-					this.dispatchTouchEvent(this.rightEvent,touchEndEvent);
-				}
-				if (this.flickup && Math.abs(degrees)<verticalTolerance) {
-					this.dispatchTouchEvent(this.upEvent,touchEndEvent);
-				}
-				if (this.flickdown && Math.abs(degrees)>180-verticalTolerance) {
-					this.dispatchTouchEvent(this.downEvent,touchEndEvent);
-				}
-				
+				this.checkForDirectionalFlicks(x,y,aspect,touchEndEvent);
 			}
-
+		}
+	},
+	checkForDirectionalFlicks: function touchTracker_checkForDirectionalFlicks(x,y,aspect,touchEndEvent) {
+		var degrees = Math.atan2(-x,-y)*180/Math.PI,
+			landscape = aspect>1,
+			verticalTolerance = landscape? 45 : 45/aspect,
+			horizontalTolerance = landscape? 45/aspect : 45;
+		if (this.flickleft && (degrees>0 && degrees<90+horizontalTolerance && degrees>90-horizontalTolerance)) {
+			this.dispatchTouchEvent(this.leftEvent,touchEndEvent);
+		}
+		if (this.flickright && (degrees<0 && degrees<-90+horizontalTolerance && degrees>-90-horizontalTolerance)) {
+			this.dispatchTouchEvent(this.rightEvent,touchEndEvent);
+		}
+		if (this.flickup && Math.abs(degrees)<verticalTolerance) {
+			this.dispatchTouchEvent(this.upEvent,touchEndEvent);
+		}
+		if (this.flickdown && Math.abs(degrees)>180-verticalTolerance) {
+			this.dispatchTouchEvent(this.downEvent,touchEndEvent);
 		}
 	},
 	trackTouch: function touchTracker_trackTouch(time,clientX,clientY) {
