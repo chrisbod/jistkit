@@ -26,6 +26,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	//custom event flags (hence lowercase) - fastdomclick fires a 'real' click the others are prefixed with jistkit e.g. jistkit.touchmove
 
 	fastdomclick: false,//set to true to avoid ios 300ms pause on click
+	
 	touchstart: true,//determines whether a jistkit.touchstart event is fired
 	touchmove: false,//set to true for touch move events - disabled by default for performance
 	touchmovestart: true,//fires when the touch has moved further than the cancel click distance - use native touch move for immediated tracking
@@ -36,6 +37,19 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchend: true,//determines whether a jistkit.touchend fires
 	touchout: false,//ALSO means that touchin events can fire if the user returns to the element,should fire when the touch leaves the element the tracker is bound to...it does NOT effect any event tracking merely sends the message
 	touchtap: true,//determines whether a jistkit.tap is fired (this occurs before a fast click is dispatched, preventing default will stop the fast click to be sent)
+
+	flick: false, //generic flicks fire at ANY angle
+	flickleft: false, //see thresholds/tolerances below
+	flickright: false,
+	flickup: false,
+	flickdown: false,
+
+	//some of these are probably going to be redundant...
+	flickHorizontalTolerance: 30, //max degrees from the x axis that will fire a horizontal flick (flickleft/flickreight)
+	flickVerticalTolerance: 30, //max degrees from the x axis that will fire a vertical flick (flickleft/flickreight)
+	flickMinimumDistance: 60, //minimum distance (px) that must be travelled by the touch to trigger a flick
+	flickMinimumSpeed: 1000, //minimum speed (px/s) the touch should be moving to trigger a flick
+
 
 	//state 'flags' TODO make readonly...
 
@@ -52,15 +66,23 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchHistory: null,//a collection of touch 'positions' tracked so far
 	eventTarget: null, //the target element of the touch events
 	
-	touchstartEvent: "jistkit.touchstart",
-	touchstartmoveEvent: "jistkit.touchstartmove",
-	touchmoveEvent: "jistkit.touchmove",
-	touchinEvent: "jistkit.touchin",
-	touchoutEvent:"jistkit.touchout",
-	touchendEvent: "jistkit.touchend",
-	touchholdEvent: "jistkit.touchhold",
-	touchchangeEvent: "jistkit.touchchange",
-	touchtapEvent: "jistkit.touchtap",
+	//touchevent names
+	touchstartEvent: "jistkit.touch.start",
+	touchstartmoveEvent: "jistkit.touch.startmove",
+	touchmoveEvent: "jistkit.touch.move",
+	touchinEvent: "jistkit.touch.in",
+	touchoutEvent:"jistkit.touch.out",
+	touchendEvent: "jistkit.touch.end",
+	touchholdEvent: "jistkit.touch.hold",
+	touchchangeEvent: "jistkit.touch.change",
+	touchtapEvent: "jistkit.touch.tap",
+
+	flickEventName: "jistkit.flick",
+	//flick event names
+	flickleftEvent: "jistkit.flick.left",
+	flickrightEvent: "jistkit.flick.right",
+	flickupEvent: "jistkit.flick.up",
+	flickdownEvent: "jistkit.flick.down",
 
 	//begin methods
 	activate: function touchTracker_activate() {
