@@ -30,7 +30,6 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchmoveconfirm: false,//fires when the touch has moved further than the cancel click distance - use native touch move for immediated tracking
 	touchchange: true,//fires if additional fingers are added to the touch - if this occurs the tracker will no longer report any events - TODO make this a flag
 	touchhold: true,//whether you want a longpress/gold event to fire (remember to use CSS to disable default behaviours..)
-	touchholdDelay: 750,//determines how long a user needs to press for it to be considered a long press(hold)
 	touchend: true,//determines whether a jistkit.touchend fires
 	touchout: false,//ALSO means that touchin events can fire if the user returns to the element,should fire when the touch leaves the element the tracker is bound to...it does NOT effect any event tracking merely sends the message
 	touchtap: true,//determines whether a jistkit.tap is fired (this occurs before a fast click is dispatched, preventing default will stop the fast click to be sent)
@@ -46,6 +45,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	//if you want to use 1:1 ratio over ride the getDeviceAspectRatio method to return 1
 	flickMinimumDistance: 75, //minimum distance (px) that must be travelled by the touch to trigger a flick
 	flickMinimumSpeed: 500, //minimum speed (px/s) the touch should be moving to trigger a flick
+	touchholdDelay: 750,//determines how long a user needs to press for it to be considered a long press(hold)
 
 	//state 'flags' - changing these outside the object could create much fun
 
@@ -90,6 +90,22 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.detachFromTarget();
 		this.reset();
 		this.activated = false;
+	},
+	enableEvents: function touchTracker_enableEvents() {
+		for (var l=arguments.length-1;l!=-1;l--) {
+			if (!arguments[l] in this || typeof this[arguments[l]] != "boolean" || !/^[a-z]+$/.test(arguments[l])) {
+				throw new Error("JistKit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be enabled")
+			}
+			this[arguments[l]] = true;
+		}
+	},
+	disableEvents: function touchTracker_disableEvents() {
+		for (var l=arguments.length-1;l!=-1;l--) {
+			if (!arguments[l] in this || typeof this[arguments[l]]!= "boolean" || !/^[a-z]$/.test(arguments[l])) {
+				throw new Error("JistKit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be disabled")
+			}
+			this[arguments[l]] = false;
+		}
 	},
 	handleEvent: function touchTracker_handleEvent(event) {
 		if (!this.disabled) {
