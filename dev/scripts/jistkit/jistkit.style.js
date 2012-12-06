@@ -28,7 +28,7 @@ JistKit.Style = {
         try {
             this.styleSheet.insertRule(selector+"{}",this.styleSheet.cssRules.length);
         } catch (e) {
-            this.styleSheet.insertRule(selector.replace("@","@"+this.prefix,""))
+            this.styleSheet.insertRule(selector.replace("@","@"+this.prefix,"")+"{}")
         }
         var rule = this.styleSheet.cssRules[this.styleSheet.cssRules.length-1];
         for (var i in definitionObject) {
