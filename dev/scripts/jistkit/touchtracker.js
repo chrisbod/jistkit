@@ -16,7 +16,7 @@ JistKit.TouchTracker = function TouchTracker(target) {
 	this.touchHistory = [];
 };
 JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
-	cancelClickDistance: 30,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click
+	cancelClickDistance: 30,//distance in pixels to decide that the user hasn't just moved finger slightly and meant to click 
 	currentDistance: 0,
 	target: this,//defaults to the window object for adding event listeners
 	disabled: false,//can be set at any time and will prevent the object from responding to ANY events (does not detach it)
@@ -28,6 +28,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	touchstart: true,//determines whether a jistkit.touchstart event is fired
 	touchmove: false,//set to true for touch move events - disabled by default for performance
 	touchmoveconfirm: false,//fires when the touch has moved further than the cancel click distance - use native touch move for immediated tracking
+	touchmovepause: false,//fires if the touch doesn't move (within tolerances) for the movepauseDelay length
 	touchchange: true,//fires if additional fingers are added to the touch - if this occurs the tracker will no longer report any events - TODO make this a flag
 	touchhold: true,//whether you want a longpress/gold event to fire (remember to use CSS to disable default behaviours..)
 	touchend: true,//determines whether a jistkit.touchend fires
@@ -46,6 +47,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	flickMinimumDistance: 75, //minimum distance (px) that must be travelled by the touch to trigger a flick
 	flickMinimumSpeed: 500, //minimum speed (px/s) the touch should be moving to trigger a flick
 	touchholdDelay: 750,//determines how long a user needs to press for it to be considered a long press(hold)
+	touchmovepauseDelay: 333,
 
 	//state 'flags' - changing these outside the object could create much fun
 
@@ -61,24 +63,25 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 	//other instance properties used by object so handle with care (better yet don't handle at all!)
 	touchHistory: null,//a collection of touch 'positions' tracked so far 
 	eventTarget: null, //the target element of the touch events
-	
+	touchmovepauseTimeout: -1,
 	//touchevent names
-	startEvent: "jistkit.touch.start",
-	touchmoveconfirmEvent: "jistkit.touch.moveconfirm",
-	moveEvent: "jistkit.touch.move",
-	inEvent: "jistkit.touch.in",
-	outEvent:"jistkit.touch.out",
-	endEvent: "jistkit.touch.end",
-	holdEvent: "jistkit.touch.hold",
-	changeEvent: "jistkit.touch.change",
-	tapEvent: "jistkit.touch.tap",
+	startEvent: "jistkit.touchstart",
+	touchmoveconfirmEvent: "jistkit.touchmoveconfirm",
+	moveEvent: "jistkit.touchmove",
+	touchmovepauseEvent: "jistkit.touchmovepause",
+	inEvent: "jistkit.touchin",
+	outEvent:"jistkit.touchout",
+	endEvent: "jistkit.touchend",
+	holdEvent: "jistkit.touchhold",
+	changeEvent: "jistkit.touchchange",
+	tapEvent: "jistkit.touchtap",
 
 	flickEvent: "jistkit.flick",
 	//flick event names
-	leftEvent: "jistkit.flick.left",
-	rightEvent: "jistkit.flick.right",
-	upEvent: "jistkit.flick.up",
-	downEvent: "jistkit.flick.down",
+	leftEvent: "jistkit.flickleft",
+	rightEvent: "jistkit.flickright",
+	upEvent: "jistkit.flickup",
+	downEvent: "jistkit.flickdown",
 
 	//begin methods
 	activate: function touchTracker_activate() {
@@ -135,6 +138,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		this.target.removeEventListener("touchmove", this, true);
 	},
 	reset: function touchTracker_reset() {
+		clearTimeout(this.touchmovepauseTimeout)
 		this.touchHistory.length = 0;//NOTE: the same array is always used
 		delete this.clicked;
 		delete this.touchmoveConfirmed;
@@ -162,7 +166,7 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 				this.dispatchTouchEvent(this.startEvent,touchStartEvent);
 			}
 			this.trackTouch(touchStartEvent.timeStamp,touch.clientX,touch.clientY);
-			this.setScopedTimeout(this.checkForTouchHold,this.touchholdDelay,[touchStartEvent,startTouch]);
+			setTimeout(this.checkForTouchHold.bind(this,touchStartEvent,startTouch),this.touchholdDelay)
 		} else if (this.touchchange) {
 			this.dispatchTouchEvent(this.changeEvent,touchStartEvent);
 		}
@@ -194,6 +198,11 @@ JistKit.createType(JistKit.TouchTracker,"touchTracker",JistKit,{
 		if (this.touchmove) {
 			this.dispatchTouchEvent(this.moveEvent,touchMoveEvent);
 		}
+		if (this.touchmovepause) {
+			clearTimeout(this.touchmovepauseTimeout);
+			this.touchmovepauseTimeout = setTimeout(this.dispatchTouchEvent.bind(this,this.touchmovepauseEvent,touchMoveEvent),this.touchmovepauseDelay);
+		}
+		
 	},
 	endTouch: function touchTracker_endTouch(touchEndEvent) {
 		var	fastdomclick = this.fastdomclick;
