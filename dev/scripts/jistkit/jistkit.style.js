@@ -25,10 +25,18 @@ JistKit.Style = {
         return rule;
     },
     addNestedRuleDefinition: function (selector,definitionObject) {
+        var declarations = selector.trim().split(' ');
+            ruleDeclaration = declarations[0],
+            name = declarations[1]||'';
+        if (this.propertyCache[ruleDeclaration]) {
+            ruleDeclaration = this.propertyCache[ruleDeclaration];
+        }
         try {
-            this.styleSheet.insertRule(selector+"{}",this.styleSheet.cssRules.length);
+            this.styleSheet.insertRule(ruledeclaration+' '+name+"{}",this.styleSheet.cssRules.length);
         } catch (e) {
-            this.styleSheet.insertRule(selector.replace("@","@"+this.prefix,"")+"{}")
+            var proprietaryPropertyName = selector.replace("@","@"+this.prefix,"")
+            this.styleSheet.insertRule(proprietaryPropertyName+"{}");
+            this.propertyCache[selector.split(' ')[0]] = proprietaryPropertyName.split(' ')[0];
         }
         var rule = this.styleSheet.cssRules[this.styleSheet.cssRules.length-1];
         for (var i in definitionObject) {
