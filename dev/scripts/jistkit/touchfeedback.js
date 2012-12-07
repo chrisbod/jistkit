@@ -5,41 +5,49 @@ JistKit.TouchTracker.TouchFeedback = function TouchFeedback(target) {
     } else if (target)  {
         this.target = target;
     }
-    this.classNames = Object.create(this.defaultClassNames);//'clone' the defaultClassNames
+    this.classNames = Object.create(this.defaults.classNames);//'clone' the defaultClassNames
+    this.enabled = Object.create(this.defaults.enabled);
+    this.events = Object.create(this.defaults.events)
     this.feedbackElement = this.createElement();
     this.feedbackClassList = this.feedbackElement.classList;
     document.body.appendChild(this.feedbackElement);
 };
 JistKit.createType(JistKit.TouchTracker.TouchFeedback,"touchFeedback",JistKit,{
-    touchstart: true,
-    touchactive: true,
-    touchheld: true,
-    touchend: true,
-    touchmoveconfirm: false,
-    touchchanged: true,
-
-    touchstartEvent: JistKit.TouchTracker.prototype.touchstartEvent,
-    touchendEvent: JistKit.TouchTracker.prototype.touchendEvent,
-    touchholdEvent: JistKit.TouchTracker.prototype.touchholdEvent,
-    touchmoveconfirmEvent: JistKit.TouchTracker.prototype.touchmoveconfirmEvent,
-    touchchangeEvent: JistKit.TouchTracker.prototype.touchchangeEvent,
-
+    
     feedbackOffsetX: 25,//these can be nasty depending on how you are animated your feedback...
     feedbackOffsetY: 25,
-    //delays for removing classes to allow animation etc
-    touchstartDelay: 250,
+    touchstartDelay: 250,//delays for removing classes to allow animation etc
     touchendDelay: 150,
     touchheldDelay: 500,
     touchmoveconfirmDelay: 0,
-
-    defaultClassNames: {
-        element: "jistkit-touchfeedback",
-        touchstart: "jistkit-touchstart",
-        touchactive: "jistkit-touchactive",
-        touchend: "jistkit-touchend",
-        touchmoveconfirm: "jistkit-moveconfirm",
-        touchhold: "jistkit-touchhold",
-        touchchange: "jistkit-touchchange"
+    classNames: null,
+    enabled: null,
+    events: null,
+    defaults: {
+        classNames: {
+            element: "jistkit-touchfeedback",
+            touchstart: "jistkit-touchstart",
+            touchactive: "jistkit-touchactive",
+            touchend: "jistkit-touchend",
+            touchmoveconfirm: "jistkit-moveconfirm",
+            touchhold: "jistkit-touchhold",
+            touchchange: "jistkit-touchchange"
+        },
+        events: {
+            touchstart: "jistkit.touchstart",
+            touchend: "jistkit.touchend",
+            touchhold: "jistkit.touchhold",
+            touchmove: "jistkit.touchmove.confirm",
+            touchchange: "jistkit.touchchange"
+        },
+        enabled: {
+            touchstart: true,
+            touchactive: true,
+            touchheld: true,
+            touchend: true,
+            touchmoveconfirm: false,
+            touchchanged: true
+        }
     },
     createElement: function (className) {
         var div = document.createElement("div");
@@ -47,22 +55,23 @@ JistKit.createType(JistKit.TouchTracker.TouchFeedback,"touchFeedback",JistKit,{
         return div;
     },
     activate: function () {
-        this.element.addEventListener(this.touchstartEvent,this,true);
+        this.element.addEventListener(this.events.touchstart,this,true);
         this.activated = true;
     },
     deactivate: function () {
         this.reset();
-        this.element.removeEventListener(this.touchstartEvent,this,true);
+        this.element.removeEventListener(this.events.touchstart,this,true);
         this.activated = false;
     },
     reset: function () {
         var element = this.element,
             feedbackClassList = this.feedbackClassList,
-            classNames = this.classNames;
-        element.removeEventListener(this.touchendEvent,this,true);
-        element.removeEventListener(this.touchmoveconfirmEvent,this,true);
-        element.removeEventListener(this.touchholdEvent,this,true);
-        element.removeEventListener(this.touchchangeEvent,this,true);
+            classNames = this.classNames,
+            events = this.events;
+        element.removeEventListener(events.touchend,this,true);
+        element.removeEventListener(events.touchmoveconfirm,this,true);
+        element.removeEventListener(events.itouchhold,this,true);
+        element.removeEventListener(events.touchchange,this,true);
         feedbackClassList.remove(classNames.touchactive);
         feedbackClassList.remove(classNames.touchend);
         feedbackClassList.remove(classNames.touchconfirmmove);
@@ -78,30 +87,30 @@ JistKit.createType(JistKit.TouchTracker.TouchFeedback,"touchFeedback",JistKit,{
     },
     handleEvent: function (event) {
         switch(event.type) {
-            case this.touchstartEvent: return this.handleTouchStart(event);
-            case this.touchendEvent: return this.handleTouchEnd(event);
-            case this.touchmoveconfirmEvent: return this.handleTouchMoveConfirm(event);
-            case this.touchholdEvent: return this.handleTouchHold(event);
+            case this.events.touchstart: return this.handleTouchStart(event);
+            case this.events.touchend: return this.handleTouchEnd(event);
+            case this.events.touchmoveconfirm: return this.handleTouchMoveConfirm(event);
+            case this.events.touchhold: return this.handleTouchHold(event);
         }
         throw new Error("JistKit.TouchFeedback unsupported event ["+event.type+"] received")
     },
     handleTouchStart: function (touchStartEvent) {
         var element = this.element;
-        element.addEventListener(this.touchendEvent,this,true);
-        element.addEventListener(this.touchmoveconfirmEvent,this,true);
-        element.addEventListener(this.touchholdEvent,this,true);
-        element.addEventListener(this.touchchangeEvent,this,true);
+        element.addEventListener(this.events.touchend,this,true);
+        element.addEventListener(this.events.touchmoveconfirm,this,true);
+        element.addEventListener(this.events.touchhold,this,true);
+        element.addEventListener(this.events.touchchange,this,true);
         this.updatePositionFromEvent(touchStartEvent);
-        if (this.touchstart) {
+        if (this.enabled.touchstart) {
             this.feedbackClassList.add(this.classNames.touchstart);
             setTimeout(this.feedbackClassList.remove.bind(this.feedbackClassList,this.classNames.touchstart),this.touchstartDelay)
         }
-        if (this.touchactive) {
+        if (this.enabled.touchactive) {
             this.feedbackClassList.add(this.classNames.touchactive);
         }
     },
     handleTouchEnd: function () {
-        if (this.touchend) {
+        if (this.enabled.touchend) {
             this.feedbackClassList.add(this.classNames.touchend);
             setTimeout(this.reset.bind(this),this.touchendDelay);
         } else {
@@ -109,7 +118,7 @@ JistKit.createType(JistKit.TouchTracker.TouchFeedback,"touchFeedback",JistKit,{
         }
     },
     handleTouchMoveConfirm: function () {
-        if (this.touchmoveconfirm) {
+        if (this.enabled.touchmoveconfirm) {
             this.feedbackClassList.add(this.classNames.touchmoveconfirm);
             setTimeout(this.reset.bind(this),this.touchmoveconfirmDelay);
         } else {
@@ -117,7 +126,7 @@ JistKit.createType(JistKit.TouchTracker.TouchFeedback,"touchFeedback",JistKit,{
         }
     },
     handleTouchHold: function () {
-        if (this.touchhold) {
+        if (this.enabled.touchhold) {
             this.feedbackClassList.add(this.touchClasses.touchhold);
             setTimeout(this.reset.bind(this),this.touchholdDelay);
         } 
