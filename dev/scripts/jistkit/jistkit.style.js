@@ -1,5 +1,5 @@
-//ALL instances of jistkit now have a .globalStyle property  (SINGLETON)
-JistKit.prototype.globalStyle = {
+
+JistKit.globalStyle = {
     styleSheet: (function jistKit_globalStyle_styleSheet_get() {
         var element = this.document.head.appendChild(this.document.createElement("style"));
         element.id = "jistkitstylesheet"
@@ -122,9 +122,9 @@ JistKit.prototype.globalStyle = {
 JistKit.createOnDemandProperty(JistKit.prototype,"sheetStyle",function jistKit_sheetStyle(jistkit) {
     var element = jistkit.element,
         id = element.id,
-        Style = jistkit.globalStyle;
+        globalStyle = JistKit.globalStyle;
     if (!id) {
-        id = element.id = Style.generateId();
+        id = element.id = globalStyle.generateId();
     }
-    return Style.ruleCache['#'+id]? Style.ruleCache['#'+id][0] : Style.addRuleDefinition('#'+id,{}).style;
+    return globalStyle.ruleCache['#'+id]? globalStyle.ruleCache['#'+id][0] : globalStyle.addRuleDefinition('#'+id,{}).style;
 })

@@ -1,3 +1,12 @@
+//TODO? add support for mouse events?
+JistKit.globalStyle.addRuleDefinition(".jistkit-touchfeedback", {
+    "position": "absolute",
+    "pointer-events": "none",
+    "visibility": "hidden"
+})
+JistKit.globalStyle.addRuleDefinition(".jistkit-touchfeedback.jistkit-touchstart, .jistkit-touchfeedback.jistkit-touchactive", {
+    "visibility": "visible"
+})
 JistKit.createType(
     ["touch","tracker","feedback"],
     function TouchFeedback(target) {
