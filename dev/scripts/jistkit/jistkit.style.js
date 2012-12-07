@@ -9,6 +9,7 @@ JistKit.Style = {
     })(),
     ruleCache: {},
     propertyCache: {},
+    idCount: 0,
     addRuleDefinition: function (selector,definitionObject) {
         if (selector.charAt(0)=="@") {
             return this.addNestedRuleDefinition(selector,definitionObject);
@@ -32,7 +33,9 @@ JistKit.Style = {
             ruleDeclaration = this.propertyCache[ruleDeclaration];
         }
         try {
-            this.styleSheet.insertRule(ruledeclaration+' '+name+"{}",this.styleSheet.cssRules.length);
+            this.styleSheet.insertRule(ruledeclaration+' '+name
+
+                +"{}",this.styleSheet.cssRules.length);
         } catch (e) {
             var proprietaryPropertyName = selector.replace("@","@"+this.prefix,"")
             this.styleSheet.insertRule(proprietaryPropertyName+"{}");
@@ -99,8 +102,24 @@ JistKit.Style = {
         }
         return rules;
     },
+    generateId: function (prefix) {
+        if (!prefix) {
+            prefix = "jistkitElement"
+        }
+        return prefix+this.idCount++;
+    },
     dispose: function () {
         //
     }
 }
-JistKit.Style.styleSheet.ownerNode.id = "jistKitStyleSheet"
+JistKit.Style.styleSheet.ownerNode.id = "jistKitStyleSheet";
+
+JistKit.createOnDemandProperty(JistKit.prototype,"sheetStyle",function jistKit_sheetStyle(jistkit) {
+    var element = jistkit.element,
+        id = element.id,
+        Style = JistKit.Style;
+    if (!id) {
+        id = element.id = Style.generateId();
+    }
+    return Style.ruleCache['#'+id]? Style.ruleCache['#'+id][0] : Style.addRuleDefinition('#'+id,{}).style;
+})

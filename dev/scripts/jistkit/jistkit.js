@@ -5,11 +5,11 @@ function JistKit(owner) {
 		});
 	}
 };
-JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,property,Constructor) {
-	Object.defineProperty(targetObject,property, {
+JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,propertyName,Constructor) {
+	Object.defineProperty(targetObject,propertyName, {
 		get: function JistKit_createOnDemandProperty_get() {
-			var object = new Constructor(this);//important on demand property will ALWAYS pass the object being attached to it
-			Object.defineProperty(this,property, {
+			var object = new Constructor(this);//IMPORTANT on demand property will ALWAYS pass the object it is being attached to
+			Object.defineProperty(this,propertyName, {
 				get: function JistKit_createOnDemandProperty_override_get() {
 					if (object==null) {
 						object = new Constructor(this);
