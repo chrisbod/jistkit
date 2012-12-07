@@ -107,5 +107,4 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 }
 //Create the 'ondemand' slot in HTMLElement object
 JistKit.createOnDemandProperty(HTMLElement.prototype,"jistKit",JistKit);
-JistKit.createOnDemandProperty(JistKit.prototype,"touch",function JistKitTouch(target){JistKit.call(this,target);});
 
