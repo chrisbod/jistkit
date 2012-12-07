@@ -10,6 +10,7 @@ function JistKit(owner) {
 	}
 };
 JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,propertyName,Constructor) {
+	////NOOOOOOOOOOOOOO closures....
 	function JistKit_createOnDemandProperty_get() {
 			var object = new Constructor(this);//IMPORTANT on demand property will ALWAYS pass the object it is being attached to		
 			Object.defineProperty(this,propertyName, {
@@ -26,8 +27,7 @@ JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetO
 			})
 			return object;
 		}
-		JistKit_createOnDemandProperty_get.Constructor = Constructor
-
+	JistKit_createOnDemandProperty_get.Constructor = Constructor
 	Object.defineProperty(targetObject,propertyName, {
 		get: JistKit_createOnDemandProperty_get
 	})
@@ -39,18 +39,17 @@ JistKit.addPropertyDefinition = function JistKit_addPropertyDefinition(propertyN
 	}
 };
 JistKit.extendFromLiteral = function JistKit_extend(Constructor,object,descriptors) {
-	var propertyName;
+	var propertyName,
+		prototype = Constructor.prototype;
 	if (object && object.constructor!=Object) {
 		throw new Error("JistKit extendFromLiteral should only be passed literal objects");
 	}
 	for (propertyName in object) {
-		Constructor.prototype[propertyName] = object[propertyName];
+		prototype[propertyName] = object[propertyName];
 	}
 	for (propertyName in descriptors) {
-		Object.defineProperty(Constructor.prototype,propertyName,descriptors[propertyName]);
+		Object.defineProperty(prototype,propertyName,descriptors[propertyName]);
 	}
-	
-
 };
 JistKit.extendFromLiteral(JistKit,
 	{
@@ -74,8 +73,7 @@ JistKit.extendFromLiteral(JistKit,
 JistKit.createType = function JistKit_createType(propertyName,Constructor,literalDefinitionOfPrototype,ParentConstructor,descriptors,useObjectCreate) {
 	if (!ParentConstructor) {
 		ParentConstructor = JistKit;
-	}
-	if (typeof ParentConstructor=="object") {
+	} else if (typeof ParentConstructor=="object") {
 		ParentConstructor == ParentConstructor.constructor;
 	}
 	if (ParentConstructor == Object) {
@@ -90,7 +88,9 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 	if (propertyName.constructor == String) {
 		this.createOnDemandProperty(ParentConstructor.prototype,propertyName,Constructor);
 	} else {
-		for (var i=0, CurrentConstructor;i<propertyName.length-1;i++) {
+		var CurrentConstructor,
+			i=0
+		for (;i!=propertyName.length-1;i++) {
 			CurrentConstructor = (Object.getOwnPropertyDescriptor(ParentConstructor.prototype,propertyName[i]).get.Constructor);
 			if (!CurrentConstructor) {
 				throw new Error("JistKit.createType: [jistKit."+propertyName.slice(0,i+1).join(".")+"] has not been defined yet");
@@ -102,7 +102,6 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 		}
 		this.createOnDemandProperty(CurrentConstructor.prototype,propertyName[i],Constructor);
 	}
-	
 	this.extendFromLiteral(Constructor,literalDefinitionOfPrototype,descriptors);
 	return Constructor;
 }

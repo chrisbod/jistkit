@@ -5,8 +5,7 @@ JistKit.globalStyle = {
         var element = this.document.head.appendChild(this.document.createElement("style"));
         element.id = "jistkitstylesheet"
         return element.sheet
-    })()
-    ,
+    })(),
     prefix: (function JistKit_globalStyle_prefix_get() {
         for (var style = getComputedStyle(document.documentElement,null),i=0;i!=style.length;i++) {
             if (style[i].charAt(0)=='-') {
@@ -23,7 +22,7 @@ JistKit.globalStyle = {
         prefix = prefix || "jistkitElement";
         return prefix+this.idCount++;
     },
-    
+
     addRuleDefinition: function JistKit_globalStyle_addRuleDefinition(selector,definitionObject) {
         if (selector.charAt(0)=="@") {
             return this.addNestedRuleDefinitions(selector,definitionObject);
@@ -126,5 +125,5 @@ JistKit.createOnDemandProperty(JistKit.prototype,"sheetStyle",function jistKit_s
     if (!id) {
         id = element.id = globalStyle.generateId();
     }
-    return globalStyle.ruleCache['#'+id]? globalStyle.ruleCache['#'+id][0] : globalStyle.addRuleDefinition('#'+id,{}).style;
+    return globalStyle.ruleCache['#'+id] ? globalStyle.ruleCache['#'+id][0] : globalStyle.addRuleDefinition('#'+id,{}).style;
 })

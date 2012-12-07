@@ -76,7 +76,7 @@ JistKit.createType(
 
             element.removeEventListener(events.touchend,this,true);
             element.removeEventListener(events.touchmoveconfirm,this,true);
-            element.removeEventListener(events.itouchhold,this,true);
+            element.removeEventListener(events.touchhold,this,true);
             element.removeEventListener(events.touchchange,this,true);
 
             feedbackClassList.remove(classNames.touchactive);
@@ -93,12 +93,12 @@ JistKit.createType(
             }
         },
         handleEvent: function touchFeedback_handleEvent(event) {
-            console.log(event.type)
+            var events = this.events;
             switch(event.type) {
-                case this.events.touchstart: return this.handleTouchStart(event);
-                case this.events.touchend: return this.handleTouchEnd(event);
-                case this.events.touchmoveconfirm: return this.handleTouchMoveConfirm(event);
-                case this.events.touchhold: return this.handleTouchHold(event);
+                case events.touchstart: return this.handleTouchStart(event);
+                case events.touchend: return this.handleTouchEnd(event);
+                case events.touchmoveconfirm: return this.handleTouchMoveConfirm(event);
+                case events.touchhold: return this.handleTouchHold(event);
             }
             throw new Error("JistKit.TouchFeedback unsupported event ["+event.type+"] received")
         },
