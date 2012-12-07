@@ -33,7 +33,7 @@ JistKit.createType(
                 touchstart: "jistkit.touchstart",
                 touchend: "jistkit.touchend",
                 touchhold: "jistkit.touchhold",
-                touchmove: "jistkit.touchmove.confirm",
+                touchmoveconfirm: "jistkit.touchmove.confirm",
                 touchchange: "jistkit.touchchange"
             },
             enabled: {
@@ -41,7 +41,7 @@ JistKit.createType(
                 touchactive: true,
                 touchheld: true,
                 touchend: true,
-                touchmoveconfirm: false,
+                touchmoveconfirm: true,
                 touchchanged: true
             }
         },
@@ -72,7 +72,7 @@ JistKit.createType(
 
             feedbackClassList.remove(classNames.touchactive);
             feedbackClassList.remove(classNames.touchend);
-            feedbackClassList.remove(classNames.touchconfirmmove);
+            feedbackClassList.remove(classNames.touchmoveconfirm);
             feedbackClassList.remove(classNames.touchchange);
             feedbackClassList.remove(classNames.touchhold);
             feedbackClassList.remove(classNames.touchstart);
@@ -84,6 +84,7 @@ JistKit.createType(
             }
         },
         handleEvent: function touchFeedback_handleEvent(event) {
+            console.log(event.type)
             switch(event.type) {
                 case this.events.touchstart: return this.handleTouchStart(event);
                 case this.events.touchend: return this.handleTouchEnd(event);
@@ -119,7 +120,7 @@ JistKit.createType(
         handleTouchMoveConfirm: function touchFeedback_handleTouchMoveConfirm() {
             if (this.enabled.touchmoveconfirm) {
                 this.feedbackClassList.add(this.classNames.touchmoveconfirm);
-                setTimeout(this.reset.bind(this),this.touchmoveconfirmDelay);
+                setTimeout(this.reset.bind(this),0);
             } else {
                 this.handleTouchEnd();
             }
