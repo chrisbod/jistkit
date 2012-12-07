@@ -1,6 +1,12 @@
-JistKit.Style = {
-    styleSheet: this.document.head.appendChild(this.document.createElement("style")).sheet,
-    prefix: (function () {
+//ALL instances of jistkit now have a .globalStyle property  (SINGLETON)
+JistKit.prototype.globalStyle = {
+    styleSheet: (function jistKit_globalStyle_styleSheet_get() {
+        var element = this.document.head.appendChild(this.document.createElement("style"));
+        element.id = "jistkitstylesheet"
+        return element.sheet
+    })()
+    ,
+    prefix: (function jistKit_globalStyle_prefix_get() {
         for (var style = getComputedStyle(document.documentElement,null),i=0;i!=style.length;i++) {
             if (style[i].charAt(0)=='-') {
                 return style[i].match(/-[^-]+-/)[0]
@@ -10,7 +16,7 @@ JistKit.Style = {
     ruleCache: {},
     propertyCache: {},
     idCount: 0,
-    addRuleDefinition: function (selector,definitionObject) {
+    addRuleDefinition: function jistKit_globalStyle_addRuleDefinition(selector,definitionObject) {
         if (selector.charAt(0)=="@") {
             return this.addNestedRuleDefinition(selector,definitionObject);
         }
@@ -25,7 +31,7 @@ JistKit.Style = {
         this.storeRuleInCache(selector,rule);
         return rule;
     },
-    addNestedRuleDefinition: function (selector,definitionObject) {
+    addNestedRuleDefinition: function jistKit_globalStyle_addNestedRuleDefinition(selector,definitionObject) {
         var declarations = selector.trim().split(' ');
             ruleDeclaration = declarations[0],
             name = declarations[1]||'';
@@ -51,10 +57,10 @@ JistKit.Style = {
         }
 
     },
-    setRulePropertyValue: function (rule,propertyName,value) {
+    setRulePropertyValue: function jistKit_globalStyle_setRulePropertyValue(rule,propertyName,value) {
         this.setStylePropertyValue(rule.style,propertyName,value)
     },
-    setStylePropertyValue: function (style,propertyName,value) {
+    setStylePropertyValue: function jistKit_globalStyle_setStylePropertyValue(style,propertyName,value) {
         if (typeof value != "string") {
             throw new Error("JistKit.Style: style property ["+propertyName+"] must be string")
         }
@@ -68,7 +74,7 @@ JistKit.Style = {
             }
         }
     },
-    storeRuleInCache: function (selector,rule) {
+    storeRuleInCache: function jistKit_globalStyle_storeRuleInCache(selector,rule) {
         for (var cache = this.ruleCache,matchingRules,selectors = selector.split(/\s*,\s*/g), i=selectors.length-1;i!=-1;i--) {
             matchingRules = cache[selectors[i]];
             if (!matchingRules) {
@@ -78,7 +84,7 @@ JistKit.Style = {
             }
         }
     },
-    getRulesBySelector: function (selector) {
+    getRulesBySelector: function jistKit_globalStyle_getRulesBySelector(selector) {
         var rules = [];
         for (var cache = this.ruleCache, selectors = selector.split(/\s*,\s*/g), i = selectors.length-1; i!=-1;i--) {
             if (cache[selectors[i]]) {
@@ -87,7 +93,7 @@ JistKit.Style = {
         }
         return rules;
     },
-    getRulesThatApplyToElement: function (element) {//THIS IS REALLY ONLY FOR DEV - it could easily grind a browser to a halt...
+    getRulesThatApplyToElement: function jistKit_globalStyle_getRulesThatApplyToElement(element) {//THIS IS REALLY ONLY FOR DEV - it could easily grind a browser to a halt...
         var methodName = "matchesSelector" in element ? "matchesSelector" : this.prefix.replace(/-/g,'')+"MatchesSelector",
             rules = [];
         if (element[methodName]) {
@@ -102,22 +108,21 @@ JistKit.Style = {
         }
         return rules;
     },
-    generateId: function (prefix) {
+    generateId: function jistKit_globalStyle_generateId(prefix) {
         if (!prefix) {
             prefix = "jistkitElement"
         }
         return prefix+this.idCount++;
     },
-    dispose: function () {
-        //
+    dispose: function jistKit_globalStyle_dispose() {
+        //TODO!!!!
     }
 }
-JistKit.Style.styleSheet.ownerNode.id = "jistKitStyleSheet";
 
 JistKit.createOnDemandProperty(JistKit.prototype,"sheetStyle",function jistKit_sheetStyle(jistkit) {
     var element = jistkit.element,
         id = element.id,
-        Style = JistKit.Style;
+        Style = jistkit.globalStyle;
     if (!id) {
         id = element.id = Style.generateId();
     }

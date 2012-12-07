@@ -74,7 +74,7 @@ JistKit.extendFromLiteral(JistKit,
 		}
 	}
 );
-JistKit.createType = function JistKit_createType(Constructor,propertyName,ParentConstructor,literalDefinitionOfPrototype,descriptors,useObjectCreate) {
+JistKit.createType = function JistKit_createType(propertyName,Constructor,literalDefinitionOfPrototype,ParentConstructor,descriptors,useObjectCreate) {
 	if (!ParentConstructor) {
 		ParentConstructor = JistKit;
 	}
