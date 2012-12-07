@@ -4,8 +4,7 @@
 //TODO: edit the comments to explain the use of Aspect Ratios better
 //TODO: fix the innerHeight and innerWidth problem with getBounding client Rect / orientation
 //TODO: look at creating a config object...
-
-JistKit.createType("touchTracker",
+JistKit.createType(["touch","tracker"],
 	function TouchTracker(target) {
 		JistKit.call(this,target);
 		this.touchHistory = [];

@@ -6,16 +6,16 @@ function JistKit(owner) {
 	}
 };
 JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,propertyName,Constructor) {
-	Object.defineProperty(targetObject,propertyName, {
-		get: function JistKit_createOnDemandProperty_get() {
+	function JistKit_createOnDemandProperty_get() {
 			var object = new Constructor(this);//IMPORTANT on demand property will ALWAYS pass the object it is being attached to
+			
 			Object.defineProperty(this,propertyName, {
-				get: function JistKit_createOnDemandProperty_override_get() {
+				get: function JistKit_createOnDemandProperty_override_get(evil) {
 					if (object==null) {
 						object = new Constructor(this);
 					}
 					return object;
-				},
+			},
 				set: function JistKit_createOnDemandProperty_override_set(value) {
 					if (value===null) object = null;
 					return object;
@@ -23,6 +23,10 @@ JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetO
 			})
 			return object;
 		}
+		JistKit_createOnDemandProperty_get.Constructor = Constructor
+
+	Object.defineProperty(targetObject,propertyName, {
+		get: JistKit_createOnDemandProperty_get
 	})
 };
 JistKit.addPropertyDefinition = function JistKit_addPropertyDefinition(propertyName,Constructor,descriptors) {
@@ -66,28 +70,39 @@ JistKit.extendFromLiteral(JistKit,
 			var messages = [this];
 			messages.push.apply(messages,arguments);
 		} : function jistKit_debug_NONE()  {},
-		setScopedTimeout: function jistKit_setTimeout(method,time,pseudoArguments) {
-			var jistKitObject = this;
-			setTimeout(function () {
-				method.apply(jistKitObject,pseudoArguments)
-			},time)
-		}
 	}
 );
 JistKit.createType = function JistKit_createType(propertyName,Constructor,literalDefinitionOfPrototype,ParentConstructor,descriptors,useObjectCreate) {
 	if (!ParentConstructor) {
 		ParentConstructor = JistKit;
 	}
+	if (typeof ParentConstructor=="object") {
+		ParentConstructor == ParentConstructor.constructor;
+	}
+	if (ParentConstructor == Object) {
+		throw new Error("JistKit_createType: illegal type passed - types with literal prototypes not supported")
+	}
 	if (useObjectCreate) {
 		Constructor.prototype = Object.create(ParentConstructor.prototype);
 	} else {
 		Constructor.prototype = new ParentConstructor();
 	}
-	this.createOnDemandProperty(ParentConstructor.prototype,propertyName,Constructor);
+	if (propertyName.constructor == String) {
+		this.createOnDemandProperty(ParentConstructor.prototype,propertyName,Constructor);
+	} else {
+		for (var i=0, CurrentConstructor;i<propertyName.length-1;i++) {
+			CurrentConstructor = (Object.getOwnPropertyDescriptor(ParentConstructor.prototype,propertyName[i]).get.Constructor);
+		}
+		if (propertyName[i] in CurrentConstructor.prototype) {
+			throw new Error("Jistkit.createType: [jistKit."+propertyName.join(".")+"] is already defined")
+		}
+		this.createOnDemandProperty(CurrentConstructor.prototype,propertyName[i],Constructor);
+	}
+	
 	this.extendFromLiteral(Constructor,literalDefinitionOfPrototype,descriptors);
 	return Constructor;
 }
 //Create the 'ondemand' slot in HTMLElement object
 JistKit.createOnDemandProperty(HTMLElement.prototype,"jistKit",JistKit);
-
+JistKit.createOnDemandProperty(JistKit.prototype,"touch",function JistKitTouch(){});
 
