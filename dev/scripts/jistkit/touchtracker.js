@@ -220,7 +220,7 @@ JistKit.createType(["touch","tracker"],
 					window.addEventListener("click",this,true);
 				}
 			}
-			if (this.touchend) {
+			if (this.enabled.touchend) {
 				this.dispatchTouchEvent(this.events.touchend,touchEndEvent);
 			}
 			this.checkForFlicks(touchEndEvent);
@@ -228,7 +228,7 @@ JistKit.createType(["touch","tracker"],
 			this.reset();
 		},
 		checkForTouchHold: function touchTracker_checkForTouchHold(touchStartEvent,touchStart) {
-			if (this.touchhold && this.touchHistory[0] == touchStart && this.touchIsInsideTolerance()) {
+			if (this.enabled.touchhold && this.touchHistory[0] == touchStart && this.touchIsInsideTolerance()) {
 				this.dispatchTouchEvent(this.events.touchhold,touchStartEvent);
 			}
 		},
