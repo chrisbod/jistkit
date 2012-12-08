@@ -9,7 +9,7 @@ JistKit.globalStyle = {
     prefix: (function JistKit_globalStyle_prefix_get() {
         for (var style = getComputedStyle(document.documentElement,null),i=0;i!=style.length;i++) {
             if (style[i].charAt(0)=='-') {
-                return style[i].match(/-[^-]+-/)[0]
+                return style[i].match(/-([^-]+)-/)[1];
             }
         }
     })(),
@@ -49,7 +49,7 @@ JistKit.globalStyle = {
         try {
             this.styleSheet.insertRule(ruleDeclaration+' '+name+"{}",cssRules.length);
         } catch (e) {
-            var proprietaryPropertyName = selector.replace("@","@"+this.prefix,"");
+            var proprietaryPropertyName = selector.replace("@","@-"+this.prefix+'-',"");
             this.styleSheet.insertRule(proprietaryPropertyName+"{}");
             this.propertyCache[selector.split(' ')[0]] = proprietaryPropertyName.split(' ')[0];
         }
@@ -71,11 +71,11 @@ JistKit.globalStyle = {
         }
         style.setProperty(this.propertyCache[propertyName] || propertyName,value);
         if (style.getPropertyValue(propertyName)===null) {//unsupported property
-            style.setProperty(this.prefix+propertyName,value);
-            if (style.getPropertyValue(this.prefix+propertyName)==null) {
+            style.setProperty("-"+this.prefix+"-"+propertyName,value);
+            if (style.getPropertyValue("-"+this.prefix+"-"+propertyName)==null) {
                 throw new Error("JistKitStyle unsupported property name ["+propertyName+"] or property value ["+definitionObject[propertyName]+"] passed");
             } else {
-                this.propertyCache[propertyName] = this.prefix+propertyName;
+                this.propertyCache[propertyName] = "-"+this.prefix+"-"+propertyName;
             }
         }
     },
@@ -99,7 +99,7 @@ JistKit.globalStyle = {
         return rules;
     },
     getRulesThatApplyToElement: function JistKit_globalStyle_getRulesThatApplyToElement(element) {//THIS IS REALLY ONLY FOR DEV - it could easily grind a browser to a halt...
-        var methodName = "matchesSelector" in element ? "matchesSelector" : this.prefix.replace(/-/g,'')+"MatchesSelector",
+        var methodName = "matchesSelector" in element ? "matchesSelector" : this.prefix+"MatchesSelector",
             rules = [];
         if (element[methodName]) {
             for (var cache = this.styleSheet.cssRules, i=cache.length-1;i!=-1;i--) {
