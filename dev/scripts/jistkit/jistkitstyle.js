@@ -1,29 +1,29 @@
-if (!this.JistKit) {
-	this.JistKit = {}
+if (!this.Jistkit) {
+	this.Jistkit = {}
 }
-JistKit.JistKitStyle = function JistKitStyle() {
+Jistkit.JistkitStyle = function JistkitStyle() {
 	this.styleSheetElement = document.head.appendChild(document.createElement("style"));
-	this.styleSheetElement.id = "jistKitStyle"+JistKitStyle.instanceCount++;
+	this.styleSheetElement.id = "jistkitStyle"+JistkitStyle.instanceCount++;
 	this.styleSheet = this.styleSheetElement.sheet;
 	this.rulesById = {};
 }
-JistKit.JistKitStyle.instanceCount = 0;
-JistKit.JistKitStyle.elementCount = 0;
-JistKit.JistKitStyle.prototype = {
-	createJistKitStyleRule: function (selector) {
+Jistkit.JistkitStyle.instanceCount = 0;
+Jistkit.JistkitStyle.elementCount = 0;
+Jistkit.JistkitStyle.prototype = {
+	createJistkitStyleRule: function (selector) {
 		var index = this.styleSheet.insertRule(selector+"{}");
 		return this.styleSheet.cssRules[index];
 	},
-	createJistKitStyleForElement: function (element) {
-		var id = element.id ? element.id : (element.id = "jistKitStyleElement"+JistKit.JistKitStyle.elementCount++);
-		return this.rulesById[id] = this.createJistKitStyleRule('#'+id).style;
+	createJistkitStyleForElement: function (element) {
+		var id = element.id ? element.id : (element.id = "jistkitStyleElement"+Jistkit.JistkitStyle.elementCount++);
+		return this.rulesById[id] = this.createJistkitStyleRule('#'+id).style;
 	}
 }
-JistKit.JistKitStyle.instance = new JistKit.JistKitStyle();
+Jistkit.JistkitStyle.instance = new Jistkit.JistkitStyle();
 
 
-Object.defineProperty(HTMLElement.prototype,"jistKitStyle",{
-	get: function JistKit_htmlElement_jistKitStyle_getter() {
-		return JistKit.JistKitStyle.instance.rulesById[this.id] || JistKit.JistKitStyle.instance.createJistKitStyleForElement(this)
+Object.defineProperty(HTMLElement.prototype,"jistkitStyle",{
+	get: function Jistkit_htmlElement_jistkitStyle_getter() {
+		return Jistkit.JistkitStyle.instance.rulesById[this.id] || Jistkit.JistkitStyle.instance.createJistkitStyleForElement(this)
 	}
 })

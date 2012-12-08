@@ -1,12 +1,12 @@
 
-JistKit.globalStyle = {
+Jistkit.globalStyle = {
 
-    styleSheet: (function JistKit_globalStyle_styleSheet_get() {
+    styleSheet: (function Jistkit_globalStyle_styleSheet_get() {
         var element = this.document.head.appendChild(this.document.createElement("style"));
         element.id = "jistkitstylesheet"
         return element.sheet
     })(),
-    prefix: (function JistKit_globalStyle_prefix_get() {
+    prefix: (function Jistkit_globalStyle_prefix_get() {
         for (var style = getComputedStyle(document.documentElement,null),i=0;i!=style.length;i++) {
             if (style[i].charAt(0)=='-') {
                 return style[i].match(/-([^-]+)-/)[1];
@@ -18,12 +18,12 @@ JistKit.globalStyle = {
     propertyCache: {},
     idCount: 0,
 
-    generateId: function JistKit_globalStyle_generateId(prefix) {
+    generateId: function Jistkit_globalStyle_generateId(prefix) {
         prefix = prefix || "jistkitElement";
         return prefix+this.idCount++;
     },
 
-    addRuleDefinition: function JistKit_globalStyle_addRuleDefinition(selector,definitionObject) {
+    addRuleDefinition: function Jistkit_globalStyle_addRuleDefinition(selector,definitionObject) {
         if (selector.charAt(0)=="@") {
             return this.addNestedRuleDefinitions(selector,definitionObject);
         } else {
@@ -33,12 +33,12 @@ JistKit.globalStyle = {
             return rule;
         }
     },
-    defineStyleDeclaration: function JistKit_defineRuleStyleDeclaration(styleDeclaration, definitionObject) {
+    defineStyleDeclaration: function Jistkit_defineRuleStyleDeclaration(styleDeclaration, definitionObject) {
         for (var propertyName in definitionObject) {
                 this.setStylePropertyValue(styleDeclaration,propertyName,definitionObject[propertyName]);
         }
     },
-    addNestedRuleDefinitions: function JistKit_globalStyle_addNestedRuleDefinitions(selector, definitionObject) {
+    addNestedRuleDefinitions: function Jistkit_globalStyle_addNestedRuleDefinitions(selector, definitionObject) {
         var declarations = selector.trim().split(' '),
             ruleDeclaration = declarations[0],
             name = declarations[1]||'',
@@ -55,31 +55,31 @@ JistKit.globalStyle = {
         }
         this.addNestedRuleDefinition(cssRules[cssRules.length-1], definitionObject);
     },
-    addNestedRuleDefinition: function JistKit_globalStyle_addNestedRuleDefinition(parentRule,definitionObject) {
+    addNestedRuleDefinition: function Jistkit_globalStyle_addNestedRuleDefinition(parentRule,definitionObject) {
         var cssRules = parentRule.cssRules;
         for (var propertyName in definitionObject) {
             parentRule.insertRule(propertyName+"{}",cssRules.length);
             this.defineStyleDeclaration(cssRules[cssRules.length-1].style,definitionObject[propertyName]);
         }
     },
-    setRulePropertyValue: function JistKit_globalStyle_setRulePropertyValue(rule,propertyName,value) {
+    setRulePropertyValue: function Jistkit_globalStyle_setRulePropertyValue(rule,propertyName,value) {
         this.setStylePropertyValue(rule.style,propertyName,value)
     },
-    setStylePropertyValue: function JistKit_globalStyle_setStylePropertyValue(style,propertyName,value) {
+    setStylePropertyValue: function Jistkit_globalStyle_setStylePropertyValue(style,propertyName,value) {
         if (typeof value != "string") {
-            throw new Error("JistKit.Style: style property ["+propertyName+"] must be string")
+            throw new Error("Jistkit.Style: style property ["+propertyName+"] must be string")
         }
         style.setProperty(this.propertyCache[propertyName] || propertyName,value);
         if (style.getPropertyValue(propertyName)===null) {//unsupported property
             style.setProperty("-"+this.prefix+"-"+propertyName,value);
             if (style.getPropertyValue("-"+this.prefix+"-"+propertyName)==null) {
-                throw new Error("JistKitStyle unsupported property name ["+propertyName+"] or property value ["+definitionObject[propertyName]+"] passed");
+                throw new Error("JistkitStyle unsupported property name ["+propertyName+"] or property value ["+definitionObject[propertyName]+"] passed");
             } else {
                 this.propertyCache[propertyName] = "-"+this.prefix+"-"+propertyName;
             }
         }
     },
-    storeRuleInCache: function JistKit_globalStyle_storeRuleInCache(selector,rule) {
+    storeRuleInCache: function Jistkit_globalStyle_storeRuleInCache(selector,rule) {
         for (var cache = this.ruleCache, matchingRules, selectors = selector.split(/\s*,\s*/g), i=selectors.length-1;i!=-1;i--) {
             matchingRules = cache[selectors[i]];
             if (!matchingRules) {
@@ -89,7 +89,7 @@ JistKit.globalStyle = {
             }
         }
     },
-    getRulesBySelector: function JistKit_globalStyle_getRulesBySelector(selector) {
+    getRulesBySelector: function Jistkit_globalStyle_getRulesBySelector(selector) {
         var rules = [];
         for (var cache = this.ruleCache, selectors = selector.split(/\s*,\s*/g), i = selectors.length-1; i!=-1;i--) {
             if (cache[selectors[i]]) {
@@ -98,7 +98,7 @@ JistKit.globalStyle = {
         }
         return rules;
     },
-    getRulesThatApplyToElement: function JistKit_globalStyle_getRulesThatApplyToElement(element) {//THIS IS REALLY ONLY FOR DEV - it could easily grind a browser to a halt...
+    getRulesThatApplyToElement: function Jistkit_globalStyle_getRulesThatApplyToElement(element) {//THIS IS REALLY ONLY FOR DEV - it could easily grind a browser to a halt...
         var methodName = "matchesSelector" in element ? "matchesSelector" : this.prefix+"MatchesSelector",
             rules = [];
         if (element[methodName]) {
@@ -113,15 +113,15 @@ JistKit.globalStyle = {
         }
         return rules;
     },
-    dispose: function JistKit_globalStyle_dispose() {
+    dispose: function Jistkit_globalStyle_dispose() {
         //TODO!!!!
     }
 }
 
-JistKit.createOnDemandProperty(JistKit.getConstructor("style").prototype,"stylesheet",function jistKit_sheetStyle(jistkit) {
+Jistkit.createOnDemandProperty(Jistkit.getConstructor("style").prototype,"stylesheet",function jistkit_sheetStyle(jistkit) {
     var element = jistkit.element,
         id = element.id,
-        globalStyle = JistKit.globalStyle;
+        globalStyle = Jistkit.globalStyle;
     if (!id) {
         id = element.id = globalStyle.generateId();
     }

@@ -1,16 +1,16 @@
 //TODO? add support for mouse events?
-JistKit.globalStyle.addRuleDefinition(".jistkit-touchfeedback", {
+Jistkit.globalStyle.addRuleDefinition(".jistkit-touchfeedback", {
     "position": "absolute",
     "pointer-events": "none",
     "visibility": "hidden"
 })
-JistKit.globalStyle.addRuleDefinition(".jistkit-touchfeedback.jistkit-touchstart, .jistkit-touchfeedback.jistkit-touchactive", {
+Jistkit.globalStyle.addRuleDefinition(".jistkit-touchfeedback.jistkit-touchstart, .jistkit-touchfeedback.jistkit-touchactive", {
     "visibility": "visible"
 })
-JistKit.createType(
+Jistkit.createType(
     ["touch","tracker","feedback"],
     function TouchFeedback(target) {
-        JistKit.call(this,target);
+        Jistkit.call(this,target);
         this.classNames = Object.create(this.defaults.classNames);//'clone' the defaultClassNames
         this.enabled = Object.create(this.defaults.enabled);
         this.events = Object.create(this.defaults.events)
@@ -100,7 +100,7 @@ JistKit.createType(
                 case events.touchmoveconfirm: return this.handleTouchMoveConfirm(event);
                 case events.touchhold: return this.handleTouchHold(event);
             }
-            throw new Error("JistKit.TouchFeedback unsupported event ["+event.type+"] received")
+            throw new Error("Jistkit.TouchFeedback unsupported event ["+event.type+"] received")
         },
         handleTouchStart: function touchFeedback_handleTouchStart(touchStartEvent) {
             var element = this.element,

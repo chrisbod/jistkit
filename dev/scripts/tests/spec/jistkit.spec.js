@@ -1,133 +1,133 @@
-describe("JistKit", function () {
+describe("Jistkit", function () {
   var element = document.documentElement,
      temporaryPointer;
   /*
-  it ("jistkit prototype should be the 'true' prototype of JistKit not an object literal", function () {
-     // expect(element.jistkit.constructor).toEqual(JistKit);
+  it ("jistkit prototype should be the 'true' prototype of Jistkit not an object literal", function () {
+     // expect(element.jistkit.constructor).toEqual(Jistkit);
   })*/
   it("jistkit should be reported in HTMLElements", function () {
-    expect(("jistKit" in element)).toEqual(true);
+    expect(("jistkit" in element)).toEqual(true);
   });
   it("elements should return the same object on each call to their jistkit property ", function () {
-    expect(element.jistKit).toEqual(element.jistKit);
+    expect(element.jistkit).toEqual(element.jistkit);
   });
   it("'element' property of instance of jistkit should point to the element it is attached to", function () {
-    expect(element.jistKit.element).toEqual(element);
+    expect(element.jistkit.element).toEqual(element);
   });
   it("jistkit objects properties should be disposed when the dispose method is called...", function () {
-    element.jistKit.dummyProperty = 1;
-    element.jistKit.dispose();
-    expect(element.jistKit.dummyProperty).toNotEqual(1);
+    element.jistkit.dummyProperty = 1;
+    element.jistkit.dispose();
+    expect(element.jistkit.dummyProperty).toNotEqual(1);
     
   });
   it("jistkit objects' element property should neither be settable nor deletable", function () {
       //TODO decide if this is really the correct behaviour as it creates a circular reference...
-      expect(element.jistKit.hasOwnProperty("element")).toEqual(true);
-      delete element.jistKit.element;
-      expect(element.jistKit.hasOwnProperty("element")).toEqual(true);
-      element.jistKit.element = null;
-      expect(element.jistKit.element).toNotEqual(null);
+      expect(element.jistkit.hasOwnProperty("element")).toEqual(true);
+      delete element.jistkit.element;
+      expect(element.jistkit.hasOwnProperty("element")).toEqual(true);
+      element.jistkit.element = null;
+      expect(element.jistkit.element).toNotEqual(null);
     });
   it("jistkit property can be set to null and the next call will return a fresh jistkit", function () {
-      var firstJistkit = element.jistKit;
-      element.jistKit.foo = true;
-      element.jistKit = null;
-      expect(element.jistKit.foo).toNotEqual(true);
-      expect(element.jistKit).toNotEqual(firstJistkit);
+      var firstJistkit = element.jistkit;
+      element.jistkit.foo = true;
+      element.jistkit = null;
+      expect(element.jistkit.foo).toNotEqual(true);
+      expect(element.jistkit).toNotEqual(firstJistkit);
     }
   );
   it("jistkit property should return new instances for different elements", function () {
-    expect(element.jistKit).toNotEqual(document.createElement("div").jistKit)
+    expect(element.jistkit).toNotEqual(document.createElement("div").jistkit)
   })
 });
-//okay dummy extender tests should be elsewhere (and should be run on EVERY extender) really but they're pretty central to jistKit
+//okay dummy extender tests should be elsewhere (and should be run on EVERY extender) really but they're pretty central to jistkit
 
 //TODO - abstract this for all types
-describe("JistKit.DummyExtender (using normal prototypical inheritence)", function () {
+describe("Jistkit.DummyExtender (using normal prototypical inheritence)", function () {
   var element = document.documentElement;
-it("dummy property should now exist in element.jistKit", function () {
-    expect(("dummy" in element.jistKit)).toEqual(true);
+it("dummy property should now exist in element.jistkit", function () {
+    expect(("dummy" in element.jistkit)).toEqual(true);
   })
-it("dummy property should be an instance of JistKitDummyExtender", function () {
-    expect(element.jistKit.dummy instanceof JistKit.DummyExtender)
+it("dummy property should be an instance of JistkitDummyExtender", function () {
+    expect(element.jistkit.dummy instanceof Jistkit.DummyExtender)
 })
 it("dummy property should return same object", function () {
-  var dummy = element.jistKit.dummy;
-  expect(dummy).toEqual(element.jistKit.dummy);
+  var dummy = element.jistkit.dummy;
+  expect(dummy).toEqual(element.jistkit.dummy);
 })
 it("DummyExtender should not be in global namespace", function () {
-  expect(typeof JistKit_DummyExtender).toEqual("undefined");
+  expect(typeof Jistkit_DummyExtender).toEqual("undefined");
 })
 it("dummy property should be settable to null etc", function () {
-  var dummy2 = element.jistKit.dummy;
-  element.jistKit.dummy = null;
-  expect(dummy2==element.jistKit.dummy).toEqual(false);
+  var dummy2 = element.jistkit.dummy;
+  element.jistkit.dummy = null;
+  expect(dummy2==element.jistkit.dummy).toEqual(false);
 
 });
 it("dummy property should be instance of DummyExtender", function () {
-  expect(element.jistKit.dummy instanceof JistKit.DummyExtender).toEqual(true);
+  expect(element.jistkit.dummy instanceof Jistkit.DummyExtender).toEqual(true);
 });
 it("dummy element getter should return the element", function () {
-  expect(element.jistKit.dummy.element).toEqual(element);
+  expect(element.jistkit.dummy.element).toEqual(element);
 });
 })
 
 
 
-describe("JistKit.DummyExtender2 (using Object.create)", function () {
+describe("Jistkit.DummyExtender2 (using Object.create)", function () {
   var element = document.documentElement;
-it("dummy2 property should now exist in element.jistKit", function () {
-    expect(("dummy2" in element.jistKit)).toEqual(true);
+it("dummy2 property should now exist in element.jistkit", function () {
+    expect(("dummy2" in element.jistkit)).toEqual(true);
   })
-it("dummy property should be an instance of JistKitDummyExtender2", function () {
-    expect(element.jistKit.dummy2 instanceof JistKit.DummyExtender2)
+it("dummy property should be an instance of JistkitDummyExtender2", function () {
+    expect(element.jistkit.dummy2 instanceof Jistkit.DummyExtender2)
 })
 it("dummy property should return same object", function () {
-  var dummy2 = element.jistKit.dummy2;
-  expect(dummy2).toEqual(element.jistKit.dummy2);
+  var dummy2 = element.jistkit.dummy2;
+  expect(dummy2).toEqual(element.jistkit.dummy2);
 })
 it("DummyExtender should not be in global namespace", function () {
-  expect(typeof JistKit_DummyExtender2).toEqual("undefined");
+  expect(typeof Jistkit_DummyExtender2).toEqual("undefined");
 })
 it("dummy property should be settable to null etc", function () {
-  var dummy2 = element.jistKit.dummy2;
+  var dummy2 = element.jistkit.dummy2;
   element.jistkit.dummy2 = null;
-  expect(dummy2==element.jistKit.dummy2).toEqual(false);
+  expect(dummy2==element.jistkit.dummy2).toEqual(false);
 
 });
 it("dummy property should be instance of DummyExtender", function () {
-  expect(element.jistKit.dummy2 instanceof JistKit.DummyExtender2).toEqual(true);
+  expect(element.jistkit.dummy2 instanceof Jistkit.DummyExtender2).toEqual(true);
 });
 it("dummy element getter should return the element", function () {
-  expect(element.jistKit.dummy2.element).toEqual(element);
+  expect(element.jistkit.dummy2.element).toEqual(element);
 });
 })
 
-describe("JistKit.DummyExtender3 (using JistKit.createType)", function () {
+describe("Jistkit.DummyExtender3 (using Jistkit.createType)", function () {
   var element = document.documentElement;
-it("dummy3 property should now exist in element.jistKit", function () {
-    expect(("dummy3" in element.jistKit)).toEqual(true);
+it("dummy3 property should now exist in element.jistkit", function () {
+    expect(("dummy3" in element.jistkit)).toEqual(true);
   })
-it("dummy property should be an instance of JistKitDummyExtender3", function () {
-    expect(element.jistKit.dummy3 instanceof JistKit.DummyExtender3)
+it("dummy property should be an instance of JistkitDummyExtender3", function () {
+    expect(element.jistkit.dummy3 instanceof Jistkit.DummyExtender3)
 })
 it("dummy property should return same object", function () {
-  var dummy3 = element.jistKit.dummy3;
-  expect(dummy3).toEqual(element.jistKit.dummy3);
+  var dummy3 = element.jistkit.dummy3;
+  expect(dummy3).toEqual(element.jistkit.dummy3);
 })
 it("DummyExtender should not be in global namespace", function () {
-  expect(typeof JistKit_DummyExtender3).toEqual("undefined");
+  expect(typeof Jistkit_DummyExtender3).toEqual("undefined");
 })
 it("dummy property should be settable to null etc", function () {
-  var dummy3 = element.jistKit.dummy3;
-  element.jistKit.dummy3 = null;
-  expect(dummy3==element.jistKit.dummy3).toEqual(false);
+  var dummy3 = element.jistkit.dummy3;
+  element.jistkit.dummy3 = null;
+  expect(dummy3==element.jistkit.dummy3).toEqual(false);
 
 });
 it("dummy property should be instance of DummyExtender", function () {
-  expect(element.jistKit.dummy3 instanceof JistKit.DummyExtender3).toEqual(true);
+  expect(element.jistkit.dummy3 instanceof Jistkit.DummyExtender3).toEqual(true);
 });
 it("dummy element getter should return the element", function () {
-  expect(element.jistKit.dummy3.element).toEqual(element);
+  expect(element.jistkit.dummy3.element).toEqual(element);
 });
 })

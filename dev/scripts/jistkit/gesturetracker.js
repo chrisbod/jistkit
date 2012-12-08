@@ -1,14 +1,14 @@
-if (!this.JistKit) {
-	this.JistKit = {}
+if (!this.Jistkit) {
+	this.Jistkit = {}
 }
-this.JistKit.GestureTracker = function GestureTracker(target) {
+this.Jistkit.GestureTracker = function GestureTracker(target) {
 	this.target = target||this.target;
 	this.target.addEventListener("touchstart", this, true);	
 	this.touches = [];
 	this.endedTouches = [];
 	this.events = [];
 }
-this.JistKit.GestureTracker.prototype = {
+this.Jistkit.GestureTracker.prototype = {
 	target: this,
 	maximumGestureTime: 500,
 	activated: false,

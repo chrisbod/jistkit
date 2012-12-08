@@ -1,8 +1,8 @@
-JistKit.Sections = function JistKit_Sections(jistkit){
-    JistKit.call(this,jistkit);
+Jistkit.Sections = function Jistkit_Sections(jistkit){
+    Jistkit.call(this,jistkit);
     this.range = document.createRange();
 }
-JistKit.createType(JistKit.Sections,"sections",JistKit,{
+Jistkit.createType(Jistkit.Sections,"sections",Jistkit,{
     sectionClassName: "jistkit-section",
     split: function () {
         var element = this.element;

@@ -1,14 +1,14 @@
 //TODO decide on precendence behaviour....
 //CHANGE TO PROXIMITY GAIN and PROXIMITY LOST like focus
-if (!this.JistKit) {
-	this.JistKit = {};
+if (!this.Jistkit) {
+	this.Jistkit = {};
 }
-JistKit.ProximityTracker = function ProximityTracker(target) {
+Jistkit.ProximityTracker = function ProximityTracker(target) {
 	this.target = target||this.target;
 	this.target.addEventListener(this.moveEvent,this,true);
 	this.elements = new this.elementsConstructor();
 }
-JistKit.ProximityTracker.prototype = {
+Jistkit.ProximityTracker.prototype = {
 	moveEvent: "ontouchmove" in this ? "touchmove" : "mousemove",
 	target: this,
 	elements: null,

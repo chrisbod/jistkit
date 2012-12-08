@@ -1,14 +1,14 @@
 //Lazy object to refer to proprietary style implementations without prefix
-JistKit.createType(["style","inline"],function JistKit_InlineStyle(target) {
-    JistKit.call(this.target);
+Jistkit.createType(["style","inline"],function Jistkit_InlineStyle(target) {
+    Jistkit.call(this.target);
     if (target) {
         this.style = target.element.style;
     }
 },{},
 null,
-(function JistKit_StandardStyle_descriptorsDefinitionGenerator() {
+(function Jistkit_StandardStyle_descriptorsDefinitionGenerator() {
     var descriptors = {},
-        prefix = JistKit.globalStyle.prefix,
+        prefix = Jistkit.globalStyle.prefix,
         style = document.documentElement.style,
         keys = Object.keys(style),
         propertyName,
@@ -17,10 +17,10 @@ null,
     function convertFirstCharacterToLowerCase(match,firstLetter) {
         return firstLetter.toLowerCase()
     };
-    function jistKit_standardStyle_$0$_get() {
+    function jistkit_standardStyle_$0$_get() {
             return this.style.$0$;
     };
-    function jistKit_standardStyle_$0$_set(value) {
+    function jistkit_standardStyle_$0$_set(value) {
             this.style.$0$ = value;
     };
 
@@ -30,8 +30,8 @@ null,
             propertyName = key.replace(prefixAndFirstLetter,convertFirstCharacterToLowerCase);
             if (!(propertyName in descriptors)) {
                 descriptors[propertyName] = {
-                    get: JistKit.Function.generateFromTemplate(jistKit_standardStyle_$0$_get,key),
-                    set: JistKit.Function.generateFromTemplate(jistKit_standardStyle_$0$_set,key)
+                    get: Jistkit.Function.generateFromTemplate(jistkit_standardStyle_$0$_get,key),
+                    set: Jistkit.Function.generateFromTemplate(jistkit_standardStyle_$0$_set,key)
                 };
             }
         }
@@ -41,10 +41,10 @@ null,
 );
 
 //create an outline equivalent for non Dom changing properties
-JistKit.createType(["style","sheet"], function JistKit_SheetStyle(target) {
-    JistKit.call(this,target);
-    this.style = target.element.jistKit.style.sheetStyle;
+Jistkit.createType(["style","sheet"], function Jistkit_SheetStyle(target) {
+    Jistkit.call(this,target);
+    this.style = target.element.jistkit.style.sheetStyle;
 },
 {},
-JistKit.getConstructor("style.inline")
+Jistkit.getConstructor("style.inline")
 );

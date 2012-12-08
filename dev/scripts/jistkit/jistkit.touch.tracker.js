@@ -4,9 +4,9 @@
 //TODO: edit the comments to explain the use of Aspect Ratios better
 //TODO: fix the innerHeight and innerWidth problem with getBounding client Rect / orientation
 //TODO: look at creating a config object...
-JistKit.createType(["touch","tracker"],
+Jistkit.createType(["touch","tracker"],
 	function TouchTracker(target) {
-		JistKit.call(this,target);
+		Jistkit.call(this,target);
 		this.touchHistory = [];
 		this.enabled = Object.create(this.defaults.enabled);
 		this.events = Object.create(this.defaults.events);
@@ -94,7 +94,7 @@ JistKit.createType(["touch","tracker"],
 		enableEvents: function touchTracker_enableEvents() {
 			for (var l=arguments.length-1;l!=-1;l--) {
 				if (!arguments[l] in this || typeof this[arguments[l]] != "boolean" || !/^[a-z]+$/.test(arguments[l])) {
-					throw new Error("JistKit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be enabled")
+					throw new Error("Jistkit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be enabled")
 				}
 				this[arguments[l]] = true;
 			}
@@ -102,7 +102,7 @@ JistKit.createType(["touch","tracker"],
 		disableEvents: function touchTracker_disableEvents() {
 			for (var l=arguments.length-1;l!=-1;l--) {
 				if (!arguments[l] in this || typeof this[arguments[l]]!= "boolean" || !/^[a-z]$/.test(arguments[l])) {
-					throw new Error("JistKit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be disabled")
+					throw new Error("Jistkit.TouchTracker: unsupported event ["+arguments[l]+"] requested to be disabled")
 				}
 				this[arguments[l]] = false;
 			}

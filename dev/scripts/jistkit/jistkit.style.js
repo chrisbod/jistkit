@@ -4,4 +4,4 @@
     
 
 */
-JistKit.createType("style",function JistKitStyle(target){JistKit.call(this,target);});
+Jistkit.createType("style",function JistkitStyle(target){Jistkit.call(this,target);});

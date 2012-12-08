@@ -1,18 +1,18 @@
-JistKit.DummyExtender = function JistKit_DummyExtender(jistkit) {
-	JistKit.call(this,jistkit);
+Jistkit.DummyExtender = function Jistkit_DummyExtender(jistkit) {
+	Jistkit.call(this,jistkit);
 }
-JistKit.DummyExtender.prototype = new JistKit();
-JistKit.createOnDemandProperty(JistKit.prototype,"dummy",JistKit.DummyExtender);
-JistKit.extendFromLiteral(JistKit.DummyExtender);
+Jistkit.DummyExtender.prototype = new Jistkit();
+Jistkit.createOnDemandProperty(Jistkit.prototype,"dummy",Jistkit.DummyExtender);
+Jistkit.extendFromLiteral(Jistkit.DummyExtender);
 
-JistKit.DummyExtender2 = function JistKit_DummyExtender2(jistkit) {
-	JistKit.call(this,jistkit);
+Jistkit.DummyExtender2 = function Jistkit_DummyExtender2(jistkit) {
+	Jistkit.call(this,jistkit);
 }
-JistKit.DummyExtender2.prototype = Object.create(JistKit.prototype);
-JistKit.createOnDemandProperty(JistKit.prototype,"dummy2",JistKit.DummyExtender2);
-JistKit.extendFromLiteral(JistKit.DummyExtender2);
+Jistkit.DummyExtender2.prototype = Object.create(Jistkit.prototype);
+Jistkit.createOnDemandProperty(Jistkit.prototype,"dummy2",Jistkit.DummyExtender2);
+Jistkit.extendFromLiteral(Jistkit.DummyExtender2);
 
-JistKit.DummyExtender3 = function JistKit_DummyExtender3(jistkit) {
-	JistKit.call(this,jistkit);
+Jistkit.DummyExtender3 = function Jistkit_DummyExtender3(jistkit) {
+	Jistkit.call(this,jistkit);
 }
-JistKit.createType(JistKit.DummyExtender3,"dummy3")
+Jistkit.createType(Jistkit.DummyExtender3,"dummy3")
