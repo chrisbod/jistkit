@@ -9,6 +9,7 @@ function JistKit(owner) {
 		}
 	}
 };
+JistKit.constructors = {};
 JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,propertyName,Constructor) {
 	////NOOOOOOOOOOOOOO closures....
 	function JistKit_createOnDemandProperty_get() {
@@ -79,14 +80,11 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 	if (ParentConstructor == Object) {
 		throw new Error("JistKit_createType: illegal type passed - types with literal prototypes not supported")
 	}
-	if (useObjectCreate) {
-		Constructor.prototype = Object.create(ParentConstructor.prototype);
-	} else {
-		Constructor.prototype = new ParentConstructor();
-	}
+	Constructor.prototype = Object.create(ParentConstructor.prototype);
 	Constructor.prototype.type = Constructor;
 	if (propertyName.constructor == String) {
-		this.createOnDemandProperty(ParentConstructor.prototype,propertyName,Constructor);
+		this.createOnDemandProperty(JistKit.prototype,propertyName,Constructor);
+		this.constructors[propertyName] = Constructor;
 	} else {
 		var CurrentConstructor,
 			i=0
@@ -101,9 +99,14 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 			throw new Error("JistKit.createType: [jistKit."+propertyName.join(".")+"] is already defined")
 		}
 		this.createOnDemandProperty(CurrentConstructor.prototype,propertyName[i],Constructor);
+		this.constructors[propertyName.join(".")] = Constructor;
+
 	}
 	this.extendFromLiteral(Constructor,literalDefinitionOfPrototype,descriptors);
 	return Constructor;
+}
+JistKit.getConstructor = function (propertiesString) {
+	return this.constructors[propertiesString];
 }
 //Create the 'ondemand' slot in HTMLElement object
 JistKit.createOnDemandProperty(HTMLElement.prototype,"jistKit",JistKit);
