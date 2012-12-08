@@ -1,27 +1,29 @@
-JistKit.createType("transform",
+//TODO make the style property dynamic based on the inline setting
+JistKit.createType(["style","transform"],
     function JistKit_Transform(target) {
         JistKit.call(this,target);
-        this.standardStyle = this.element.jistkit.standardStyle;
+        this.style = this.element.jistKit.style.inline;
         this.transforms = {};
     },{
+    inline: false,
     apply: function jistKit_transform_apply () {
         var transforms = [];
         for (var propertyName in this.transforms) {
             transforms.push(propertyName+'('+this.transforms[i]+')');
         }
-        this.standardStyle.transform = transforms.sort().toString();
-        return this.standardStyle.transform;
+        this.style.transform = transforms.sort().toString();
+        return this.style.transform;
     },
     reset: function jistKit_transform_apply() {
         
         for (var propertyName in this.transforms) {
             delete this.transforms[propertyName];
         }
-        return this.standardStyle.transform;
+        return this.style.transform;
     },
     synchronizeWith: function() {},
     getCurrentValue: function () {
-        return this.standardStyle.transform;
+        return this.style.transform;
     },
     getSpecificValue: function (transformName) {
         

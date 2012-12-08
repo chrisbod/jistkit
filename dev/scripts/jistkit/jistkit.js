@@ -80,33 +80,37 @@ JistKit.createType = function JistKit_createType(propertyName,Constructor,litera
 	if (ParentConstructor == Object) {
 		throw new Error("JistKit_createType: illegal type passed - types with literal prototypes not supported")
 	}
+	if (Constructor==ParentConstructor) {
+		throw new Error("Inheritance error - an object cannot extend itself")
+	}
 	Constructor.prototype = Object.create(ParentConstructor.prototype);
 	Constructor.prototype.type = Constructor;
 	if (propertyName.constructor == String) {
-		this.createOnDemandProperty(JistKit.prototype,propertyName,Constructor);
-		this.constructors[propertyName] = Constructor;
-	} else {
-		var CurrentConstructor,
-			i=0
-		for (;i!=propertyName.length-1;i++) {
-			CurrentConstructor = (Object.getOwnPropertyDescriptor(ParentConstructor.prototype,propertyName[i]).get.Constructor);
-			if (!CurrentConstructor) {
-				throw new Error("JistKit.createType: [jistKit."+propertyName.slice(0,i+1).join(".")+"] has not been defined yet");
-			}
-			ParentConstructor = CurrentConstructor;
-		}
-		if (propertyName[i] in CurrentConstructor.prototype) {
-			throw new Error("JistKit.createType: [jistKit."+propertyName.join(".")+"] is already defined")
-		}
-		this.createOnDemandProperty(CurrentConstructor.prototype,propertyName[i],Constructor);
-		this.constructors[propertyName.join(".")] = Constructor;
-
+		propertyName = [propertyName];
 	}
+	if (propertyName.length==1) {
+		this.createOnDemandProperty(JistKit.prototype,propertyName[propertyName.length-1],Constructor);
+	} else {
+		this.createOnDemandProperty(this.getConstructor(propertyName.slice(0,-1).join(".")).prototype,propertyName[propertyName.length-1],Constructor);
+	}
+	this.defineConstructor(propertyName.join("."),Constructor);
 	this.extendFromLiteral(Constructor,literalDefinitionOfPrototype,descriptors);
 	return Constructor;
 }
+JistKit.defineConstructor = function (path,Constructor) {
+	for (var i in this.constructors) {
+		if (this.constructors[i] == Constructor) {
+			throw new Error("JistKit.defineConstructor: duplicate constructor registered ["+path+"]");
+		}
+	}
+	this.constructors[path] = Constructor;
+}
 JistKit.getConstructor = function (propertiesString) {
-	return this.constructors[propertiesString];
+	var Constructor = this.constructors[propertiesString]
+	if (!Constructor) {
+		throw new Error("JistKit.getConstructor: no such constructor ["+propertiesString+"] exists")
+	}
+	return Constructor;
 }
 //Create the 'ondemand' slot in HTMLElement object
 JistKit.createOnDemandProperty(HTMLElement.prototype,"jistKit",JistKit);

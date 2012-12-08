@@ -5,4 +5,4 @@
     err...
 
 */
-JistKit.createOnDemandProperty(JistKit.prototype,"touch",function JistKitTouch(target){JistKit.call(this,target);});
+JistKit.createOnDemandProperty(JistKit.prototype,"style",function JistKitTouch(target){JistKit.call(this,target);});
