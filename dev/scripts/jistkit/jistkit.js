@@ -1,15 +1,22 @@
 function JistKit(owner) {
-	if (owner) {
+	if (owner) {//Need to sort out disposal now I've changed the approach
 		if (owner instanceof HTMLElement) {
-			this.element = owner;
+			Object.defineProperty(this,"element",{
+				get: JistKit.returnElement.bind(owner)
+			})
 		} else {
-			if (owner.element) {
-				this.element = owner.element;
+			if ("element" in owner) {
+				Object.defineProperty(this,"element",{
+					get: Object.getOwnPropertyDescriptor(owner,"element").get
+				})
 			}	
 		}
 	}
 };
 JistKit.constructors = {};
+JistKit.returnElement = function () {
+	return this;
+}
 JistKit.createOnDemandProperty = function JistKit_createOnDemandProperty(targetObject,propertyName,Constructor) {
 	////NOOOOOOOOOOOOOO closures....
 	function JistKit_createOnDemandProperty_get() {
@@ -64,6 +71,7 @@ JistKit.extendFromLiteral(JistKit,
 				}
 				delete this[keys[l]];
 			}
+
 		},
 		debug: this.DEBUG ? function jistKit_debug() {//looks for global/window debug flag
 			var messages = [this];
