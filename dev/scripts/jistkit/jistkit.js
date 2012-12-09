@@ -1,20 +1,26 @@
-function Jistkit(owner) {
-	if (owner) {//Need to sort out disposal now I've changed the approach
-		if (owner instanceof HTMLElement) {
+function Jistkit(target) {
+	if (target) {//Need to sort out disposal now I've changed the approach
+		if (target instanceof HTMLElement) {
 			Object.defineProperty(this,"element",{
-				get: Jistkit.returnElement.bind(owner)
+				get: Jistkit.returnThis.bind(target)
 			})
 		} else {
-			if ("element" in owner) {
+			if ("element" in target) {
+				if (!(target.element instanceof HTMLElement)) {
+					throw new Error(Jistkit.caller.name+" illegal element type passed")
+				}
 				Object.defineProperty(this,"element",{
-					get: Object.getOwnPropertyDescriptor(owner,"element").get
+					get: Object.getOwnPropertyDescriptor(target,"element").get
 				})
-			}	
-		}
+			}
+			else throw new Error(Jistkit.caller.name+" passed target without element")
+		} 
+	} else {
+			throw new Error(Jistkit.caller.name+" instantiated without a target")
 	}
 };
 Jistkit.constructors = {};
-Jistkit.returnElement = function () {
+Jistkit.returnThis = function Jistkit_returnThis() {
 	return this;
 }
 Jistkit.createOnDemandProperty = function Jistkit_createOnDemandProperty(targetObject,propertyName,Constructor) {
@@ -61,7 +67,6 @@ Jistkit.extendFromLiteral = function Jistkit_extend(Constructor,object,descripto
 };
 Jistkit.extendFromLiteral(Jistkit,
 	{
-		ownerPropertyName: "element",//IMPORTANT this should always be overwritten
 		element: null,
 		dispose: function jistkit_dispose(nonRecursive) {
 			this.element.jistkit = null;
@@ -71,28 +76,22 @@ Jistkit.extendFromLiteral(Jistkit,
 				}
 				delete this[keys[l]];
 			}
-
 		},
 		debug: this.DEBUG ? function jistkit_debug() {//looks for global/window debug flag
 			var messages = [this];
 			messages.push.apply(messages,arguments);
 		} : function jistkit_debug_NONE()  {},
+		parentConstructor: Object
 	}
 );
 Jistkit.createType = function Jistkit_createType(propertyName,Constructor,literalDefinitionOfPrototype,ParentConstructor,descriptors,useObjectCreate) {
-	if (!ParentConstructor) {
-		ParentConstructor = Jistkit;
-	} else if (typeof ParentConstructor=="object") {
-		ParentConstructor == ParentConstructor.constructor;
+	if (ParentConstructor) {
+		if (Constructor==ParentConstructor) {
+			throw new Error("Inheritance error - an object cannot extend itself")
+		}
+		Constructor.prototype = Object.create(ParentConstructor.prototype);
+		Constructor.prototype.parentConstructor = ParentConstructor;
 	}
-	if (ParentConstructor == Object) {
-		throw new Error("Jistkit_createType: illegal type passed - types with literal prototypes not supported")
-	}
-	if (Constructor==ParentConstructor) {
-		throw new Error("Inheritance error - an object cannot extend itself")
-	}
-	Constructor.prototype = Object.create(ParentConstructor.prototype);
-	Constructor.prototype.type = Constructor;
 	if (propertyName.constructor == String) {
 		propertyName = [propertyName];
 	}
@@ -122,4 +121,3 @@ Jistkit.getConstructor = function (propertiesString) {
 }
 //Create the 'ondemand' slot in HTMLElement object
 Jistkit.createOnDemandProperty(HTMLElement.prototype,"jistkit",Jistkit);
-

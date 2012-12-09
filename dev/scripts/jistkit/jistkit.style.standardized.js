@@ -1,9 +1,7 @@
 //Lazy object to refer to proprietary style implementations without prefix
 Jistkit.createType(["style","inline"],function Jistkit_InlineStyle(target) {
-    Jistkit.call(this.target);
-    if (target) {
-        this.style = target.element.style;
-    }
+    Jistkit.call(this,target);
+    this.style = this.element.style;
 },{},
 null,
 (function Jistkit_StandardStyle_descriptorsDefinitionGenerator() {
@@ -21,6 +19,7 @@ null,
             return this.style.$0$;
     };
     function jistkit_standardStyle_$0$_set(value) {
+        console.log(this)
             this.style.$0$ = value;
     };
 
@@ -43,7 +42,7 @@ null,
 //create an outline equivalent for non Dom changing properties
 Jistkit.createType(["style","sheet"], function Jistkit_SheetStyle(target) {
     Jistkit.call(this,target);
-    this.style = target.element.jistkit.style.sheetStyle;
+    this.style = this.element.jistkit.style.stylesheet;
 },
 {},
 Jistkit.getConstructor("style.inline")
