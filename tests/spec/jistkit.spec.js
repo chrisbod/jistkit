@@ -51,6 +51,9 @@ it("dummy property should now exist in element.jistkit", function () {
 it("dummy property should be an instance of JistkitDummyExtender", function () {
     expect(element.jistkit.dummy instanceof window.DummyExtender)
 })
+it ("dummy property should not (any longer) be an instanceof Jistkit",  function () {
+    expect(element.jistkit.dummy instanceof Jistkit).toEqual(false)
+})
 it("dummy property should return same object", function () {
   var dummy = element.jistkit.dummy;
   expect(dummy).toEqual(element.jistkit.dummy);
