@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<style>
+    section.pages {
+        width: 50%;
+        position: absolute;
+        top: 0;
+        left: 50%;
+        height: 100%;
+        -webkit-transform-style: preserve-3d;
+        -webkit-transform: rotateY(0deg);
+        -webkit-transform-origin: left center;
+        box-sizing: border-box;
+        -webkit-transition: none;
+        
+        background-color: white;
+    }
+    div.front, div.back {
+        display: block;
+        height: 100%;
+        width: 100%;
+        position: absolute;
+        background-color: white;
+        -webkit-transform-style: preserve-3d;
+        webkit-transform: rotateY(0deg);
+        backface-visibility: hidden;
+    }
+    div.back {
+        -webkit-transform: rotateY(-180deg);
+    }
+    
+
+
+    
+    
+   
+    
+
+</style>
+</head>
+<body>
+    <section class="pages">
+        <div class="front">
+            <h2>Page 6 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 6 back</h2>
+        </div>
+    </section>
+   <section class="pages">
+        <div class="front">
+            <h2>Page 5 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 5 back</h2>
+        </div>
+    </section>
+       <section class="pages">
+        <div class="front">
+            <h2>Page 4 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 4 back</h2>
+        </div>
+    </section>
+       <section class="pages">
+        <div class="front">
+            <h2>Page 3 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 3 back</h2>
+        </div>
+    </section>
+       <section class="pages">
+        <div class="front">
+            <h2>Page 2 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 2 back</h2>
+        </div>
+    </section>
+       <section class="pages">
+        <div class="front">
+            <h2>Page 1 front</h2>
+        </div>
+        <div class="back">
+            <h2>Page 1 back</h2>
+        </div>
+    </section>
+</body>
+</html>

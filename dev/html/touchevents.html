@@ -151,6 +151,7 @@ onscroll fires only at the end of the touch/scroll
 			mouseUpEvent.stopPropagation();
 			mouseUpEvent.preventDefault();	
 			this.createTouchEvent("touchend",mouseUpEvent);
+			//whatabout the element the up actually occurs on
 			this.dispatchUIEvents();
 			return false;
 		},
@@ -171,6 +172,7 @@ onscroll fires only at the end of the touch/scroll
 			this.createTouchLists(touchEvent,sourceEvent);
 			touchEvent.initEvent(eventName, false, false);
 			this.currentElement.dispatchEvent(touchEvent);
+
 
 		},
 		createTouchLists: function (touchEvent,sourceEvent) {
@@ -200,7 +202,7 @@ onscroll fires only at the end of the touch/scroll
                      sourceEvent.detail, sourceEvent.screenX, sourceEvent.screenY, sourceEvent.clientX, sourceEvent.clientY, 
                      sourceEvent.ctrlKey, sourceEvent.altKey, sourceEvent.shiftKey, sourceEvent.metaKey, 
                      sourceEvent.button, sourceEvent.relatedTarget);
-			this.currentElement.dispatchEvent(uiEvent);
+			sourceEvent.target.dispatchEvent(uiEvent);
 		}
 
 	})

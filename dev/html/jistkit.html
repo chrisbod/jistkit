@@ -1,0 +1,24 @@
+<!docytype html>
+<html>
+
+	<head>
+	<script src="../scripts/jistkit/jistkit.js"></script>
+	<script>
+		Jistkit.Style = function (jistkit) {
+			this.element = jistkit.element;
+		}
+		Jistkit.createOnDemandProperty(Jistkit.prototype,"style",Jistkit.Style);
+	
+		
+	</script>
+
+	</head>
+
+	<body>
+		<script>
+console.log(document.documentElement.jistkit.style===document.documentElement.jistkit.style,document.body.jistkit)
+		</script>
+
+	</body>
+
+</html>

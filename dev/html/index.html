@@ -1,0 +1,26 @@
+<!doctype html>
+<html>
+	<head>
+	<script src="../scripts/jistkit/touchtracker.js"></script>
+	<script>
+	var defaultTouchTracker = new Jistkit.TouchTracker()
+	var tracker = {
+			handleEvent: function (event) {
+				console.log(event.type)
+			}
+		}
+	function track() {
+		document.body.addEventListener("touchstart",tracker,true )
+		document.body.addEventListener("touchmove",tracker,true )
+		document.body.addEventListener("touchend",tracker,true )
+		document.body.addEventListener("touchcancel",tracker,true)
+
+	}
+	onload = track
+	</script>
+	</head>
+	<body>
+<div style="position:absolute; width: 90%; height: 90%; background-color: blue">
+</div>
+	</body>
+</html>

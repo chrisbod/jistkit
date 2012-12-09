@@ -1,0 +1,143 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge,chrome=1">
+<title>Examples</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
+<script src="../scripts/jistkit/jistkit.js"></script>
+<script src="../scripts/jistkit/jistkit.function.js"></script>
+<script src="../scripts/jistkit/jistkit.style.js"></script>
+<script src="../scripts/jistkit/jistkit.style.stylesheet.js"></script>
+<script src="../scripts/jistkit/jistkit.style.standardized.js"></script>
+<script src="../scripts/jistkit/jistkit.style.transform.js"></script>
+<script src="../scripts/jistkit/jistkit.touch.js"></script>
+<script src="../scripts/jistkit/jistkit.touch.tracker.js"></script>
+<script src="../scripts/jistkit/jistkit.touch.feedback.js"></script>
+
+<style>
+.jistkit-touchfeedback {
+    width: 100px;
+    height: 100px;
+    margin-left:-25px;
+    margin-top: -25px;
+    border: 1.5px solid rgba(255,255,255,1);
+    border-radius: 50%;
+    
+    -webkit-transition-property: width, height, margin-left, margin-top, border-color,visibility;
+    -webkit-transition-duration: 0.25s,0.25s,0.25s,0.25s,0.25s,0.5s;
+    box-sizing: border-box;
+     -webkit-animation-duration: 0.6s;
+     -webkit-animation-iteration-count: infinite;
+     -webkit-animation-direction: alternate;
+     -webkit-animation-fill-mode: forwards;
+     -webkit-animation-delay: 0.25s;
+    
+}
+
+@-webkit-keyframes borderglow {
+    0% { border-color: rgba(255,255,255,1); }
+    20% { border-color: rgba(255,255,255,0.75); }
+    40%   { border-color: rgba(255,255,255,0.6); }
+    60% { border-color: rgba(255,255,255,0.45); } 
+    80%   { border-color: rgba(255,255,255,0.3); }
+    100% { border-color: rgba(255,255,255,0); }
+}
+/*
+{
+    "0%":{"border-color":"rgba(255,255,1)"};
+
+}
+
+
+
+*/
+.jistkit-touchfeedback.jistkit-touchactive {
+    width: 100px;
+    height: 100px;
+    margin-left:-25px;
+    margin-top: -25px;
+    -webkit-animation-name: borderglow;
+}
+.jistkit-touchfeedback.jistkit-touchstart
+ {
+    width: 50px;
+    height: 50px;
+    margin-left:0px;
+    margin-top:0px;
+    -webkit-animation-name: borderglow;
+}
+
+.jistkit-touchfeedback:after {
+    content: "";
+    position: absolute;
+    left:50%;
+    top: 50%;
+    height: 50px;
+    width: 50px;
+    margin-left: -25px;
+    margin-top: -25px;
+    border: 3px solid white;
+    border-radius: 50%;
+    box-sizing: border-box;
+    opacity: 0.5;
+    -webkit-transition-property: visibility;
+    -webkit-transition-duration: 1s;
+}
+.jistkit-touchfeedback.touchmoveconfirm {
+    visibility: hidden;
+}
+
+
+
+</style>
+</head>
+<body>
+    <script>
+        
+        var logger = {
+            handleEvent: function (event) {
+                if (event.type=="jistkit.touchend") {
+                    //console.log(event.touchTracker.touchHistory)
+                }
+                else {
+                    console.log(event.type,event.touchTracker)
+                }
+            }
+        }
+        onload = function () {
+            var tracker = document.getElementById("touchcanvas").jistkit.touch.tracker;
+                tracker.activate();
+                var pulse = document.getElementById("touchcanvas").jistkit.touch.tracker.feedback;
+                pulse.activate()
+                //console.log(pulse)
+               // document.body.addEventListener("jistkit.touchmovepause", logger,false)
+
+               /* document.body.addEventListener("jistkit.touchtap", logger,false)
+                document.body.addEventListener("jistkit.touchstart", logger,false)
+                document.body.addEventListener("jistkit.touchmove.confirm", logger,false)
+                document.body.addEventListener("jistkit.touchmove", logger,false)
+                document.body.addEventListener("jistkit.touchend", logger,false)
+                document.body.addEventListener("jistkit.touchhold", logger,false)
+                document.body.addEventListener("jistkit.touchout", logger,true)
+                document.body.addEventListener("jistkit.touchin", logger,true)
+                document.body.addEventListener("jistkit.flick", logger,true)
+                document.body.addEventListener("jistkit.flickup", logger,true)
+                document.body.addEventListener("jistkit.flickleft", logger,true)
+                document.body.addEventListener("jistkit.flickright", logger,true)
+                document.body.addEventListener("jistkit.flickdown", logger,true)
+                document.body.addEventListener("click", logger,false)*/
+                document.getElementById('touchcanvas').jistkit.style.inline.backgroundColor = 'red'
+
+            }
+
+     
+        
+
+    </script>
+    <div id="touchcanvas" style="position: absolute; width: 400px; height: 400px; top: 0; left: 0"></div>
+
+    <hr>
+</body>
+</html>

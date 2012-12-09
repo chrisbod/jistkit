@@ -15,7 +15,9 @@
 				overflow: hidden;
 				box-sizing: border-box;
 			}
-
+			div.columned * {
+				outline: 1px dotted red;
+			}
 			img {
 				width: 10em;
 				height: 5em;
@@ -55,71 +57,7 @@
 		</style>
 		<script>
 
-		var Jistkit = {
-			instantiate: function Jistkit_instantiate(Constructor,argumentArray) {
-				return Constructor.apply(
-					Object.create(Constructor.prototype),
-					argumentArray
-				);
-			},
-			ColumnScroll: function Jistkit_ColumnScroll(element) {
-				this.element = element;
-				if (element) this.initialize();
-			}
-				
-		}
-		Jistkit.ColumnScroll.prototype = {
-			initialize: function Jistkit_ColumnScroll_initialize() {
-				//this.element.style.overflow = 'hidden';
-				if (this.element.tabIndex=-1) {
-					this.element.tabIndex = "0";
-				}
-				this.element.addEventListener("keydown",this,true);
-			},
-			handleEvent: function (event) {
-				switch (event.type) {
-					case "keydown": return this.move(event);
-				}
-			},
-			getColumnWidth: function () {
-				return this.element.clientWidth;
-				//return parseFloat(this.element.ownerDocument.defaultView.getComputedStyle(this.element,null).webkitColumnWidth);
-			},
-			move: function (event) {
-				if (event.keyCode == 37) return this.moveBackward(event)
-				if (event.keyCode == 39) return this.moveForward(event)
-			},
-			moveForward: function () {
-				var columnWidth = this.getColumnWidth(),
-					newScrollLeft = this.element.scrollLeft + columnWidth
-				if (newScrollLeft+columnWidth < this.element.scrollWidth) {
-					this.element.scrollLeft += columnWidth;
-				}
-			},
-			moveBackward: function () {
-				var columnWidth = this.getColumnWidth();
-				this.element.scrollLeft -= columnWidth;
-			}
-
-		}
-
-		addEventListener("webkitAnimationEnd", function (event) {//TODO think about json.parse instead...
-			
-			var types = eval('({'+event.target.getAttribute("data-jistkit")+'})');
-			for (var i=0, keys = Object.keys(types), l = keys.length, key, path, Constructor = Jistkit;i!=l;i++) {
-				key = keys[i];
-				path = key.split('.');
-				for (var j=0;j<path.length;j++) {
-					Constructor = Constructor[path[j]];
-				}
-				types[key].unshift(event.target);
-				Jistkit.instantiate(Constructor,types[key])
-			}
-		}
-		,true)
-
-		onload = function () {
-			function addClientRectsOverlay(elt) {
+		function addClientRectsOverlay(elt,color) {
 			    // Absolutely position a div over each client rect so that its border width
 			    // is the same as the rectangle's width.
 			    // Note: the overlays will be out of place if the user resizes or zooms.
@@ -130,7 +68,7 @@
 			        var tableRectDiv = document.createElement('div');
 			        tableRectDiv.classList.add("rect")
 			        tableRectDiv.style.position = 'absolute';
-			        tableRectDiv.style.border = '1px solid red';
+			        tableRectDiv.style.border = '1px solid '+color;
 			        var scrollTop = document.documentElement.scrollTop || document.body.scrollTop;
 			        var scrollLeft = document.documentElement.scrollLeft || document.body.scrollLeft;
 			        tableRectDiv.style.margin = tableRectDiv.style.padding = '0';
@@ -142,80 +80,64 @@
 			        document.body.appendChild(tableRectDiv);
 			    }
 			}
-			
-function ColumnSplitter(element) {
-			this.element = element;
-			this.children = element.children;
-			this.computedStyle = getComputedStyle(element,null);
-			this.columnContainers = []
-		}
-		ColumnSplitter.prototype.split = function () {
-			var children = [];
-			[].push.apply(children,this.children);
-			this.generateContainers(children,this.element.getBoundingClientRect())
-			document.getElementById('foo').appendChild(this.columnContainers[0])
-			var overflow = this.trimColumn(this.columnContainers[0])
-			document.getElementById('foo').appendChild(this.columnContainers[1])
-		    this.trimColumn(this.columnContainers[1],overflow)
-		    
-		}
-		ColumnSplitter.prototype.generateContainers = function (children,clientRect) {
-			var childFragment = document.createDocumentFragment()
-			for (var i=0,children,child,childRect;i!=children.length;i++) {
-					child = children[i];
-					childRect = child.getBoundingClientRect();
-					childFragment.appendChild(child.cloneNode(true))
-				if (i!=0 && (childRect.top<clientRect.top||childRect.bottom>clientRect.bottom)) {
-					break;
-				} 
-			}
-			var newDiv = this.createNewContainer(child,clientRect.height)
-			newDiv.appendChild(childFragment)
-			
-			this.columnContainers.push(newDiv);
-			var slice = children.slice(i);
-			if (slice.length) this.generateContainers(slice,clientRect)
-
-		}
-		ColumnSplitter.prototype.trimColumn = function (newDiv,offset) {
-			var rect = newDiv.getBoundingClientRect()
-			var range = document.createRange()
-			range.selectNode(newDiv);
-			var rects = range.getClientRects();
-			var trueTop = rects[rects.length-1].top-rect.top;
-			var clippedRectsHeight = 0;
-			for (var i=rects.length-1;i!=-1;i--) {
-				if (rects[i].bottom<=rect.bottom) {
-					break;
+			function ScrollInspector(element) {
+				this.element = element;
+				var containerRectangle = element.getBoundingClientRect()
+				var children = element.children,
+				rects = [],
+				boundingRects = [],
+				overflowers = [],
+				range = document.createRange()
+				for (var i=0;i<children.length;i++) {
+					boundingRects.push(children[i].getBoundingClientRect())
+					range.selectNode(children[i])
+					addClientRectsOverlay(children[i],"blue")
+					rects.push(range.getClientRects())
 				}
-				clippedRectsHeight+=rects[i].height;
-			}
-			var height = rects[i].bottom-rect.top;
-			newDiv.style.height = height+"px";
-			//if (offset) newDiv.scrollTop = offset
-			return clippedRectsHeight;
-		}
-		ColumnSplitter.prototype.createNewContainer = function (child,height) {
-			var container = this.element.cloneNode(false);
-			container.style.width = (child.getBoundingClientRect().width)+"px";
-			container.style.webkitColumnWidth = "auto"
-			container.style.height = height+"px";
+				for (var i=0;i<boundingRects.length;i++) {
+					if (boundingRects[i].top<containerRectangle.top || boundingRects[i].bottom>containerRectangle.bottom) {
+						overflowers.push(children[i])
+					}
+				}
+				for (var i=0;i<overflowers.length;i++) {
+					//range.selectNodeContents(overflowers[i])
+					//var contents = range.extractContents()
+					//console.log(contents.childNodes.length)
+					if (i==0) fitText(overflowers[i])
 
-			return container;
-		}
-		var cs = new ColumnSplitter(document.querySelector(".columned"))
-		cs.split()
-		var elements = document.querySelectorAll(".columned *");
-			for (var i=0;i<elements.length;i++) {
-				//addClientRectsOverlay(elements[i])
+				}
 			}
-			//addClientRectsOverlay(document.querySelector(".columned h1"))
-			//addClientRectsOverlay(document.querySelector("#foo"))
-			var ran = document.createRange()
-			ran.selectNode(document.getElementById("foo").firstElementChild)
-			addClientRectsOverlay(ran)
-		}
-		
+			function fitText(element) {
+				var range = document.createRange()
+				range.selectNode(element)
+				
+				
+				
+				var width = range.getClientRects()[1].width;
+				console.log(width)
+				range.collapse(true)
+				var startPos = 0;
+				range.setEnd(element.firstChild,++startPos)
+				
+				while (range.getClientRects()[1].width<width) {
+					range.setEnd(element.firstChild,++startPos)
+				}
+				var frag = range.extractContents()
+				element.parentNode.insertBefore(frag,element)
+				range.setStartBefore(element.parentNode)
+				range.setEndBefore(element);
+
+				document.body.appendChild(range.extractContents())
+				document.body.lastChild.classList.remove("columned")
+				var chars = 0;
+				console.log(range.toString())
+				
+
+				
+			}
+			onload = function () {
+				var si = new ScrollInspector(document.querySelector(".columned"))
+			}
 		</script>
 	</head>
 	<body>

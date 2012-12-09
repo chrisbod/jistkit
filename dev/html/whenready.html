@@ -1,0 +1,34 @@
+<!doctype html>
+<html>
+	<head>
+		<script>
+			function JistkitWhenReady() {
+
+			}
+			JistkitWhenReady.prototype = {
+				jistkit: null,
+				whenReady: function jistkitWhenReady(callback) {
+					if (!this.jistkit) {
+						this.jistkit = {object:this};
+					}
+					if (!this.jistkit.whenReadies) {
+						this.jistkit.whenReadies = [];
+					}
+					var whenReadies = this.jistkit.whenReadies;
+					if (whenReadies.indexOf(callback)) {
+						return callback;
+					} else {
+						whenReadies.push(callback)
+					}
+				}
+			}
+
+
+
+		</script>
+	</head>
+	<body>
+	</body>
+
+
+</html>

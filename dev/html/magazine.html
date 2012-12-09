@@ -1,0 +1,133 @@
+<!doctype html>
+<html>
+	<head>
+	<!--<a href="#" style="opacity: 1; visibility: visible; -webkit-transform: translateX(350px) translateZ(-200px) rotateY(-45deg);"><img src="images/2.jpg" alt="image02"><div>http://www.percivalclo.com/</div></a>-->
+
+	<style>
+body > section {
+		position: absolute;
+		top: 20%;
+		left: 20%;
+		right: 20%;
+		bottom: 20%;
+		-webkit-transform-style: preserve-3d;
+		-webkit-perspective: 1000px;
+
+	}
+	section.issue {
+		background-color: rgb(255,255,255);
+		box-shadow: 0px 0px 5px rgba(0,0,0,1);
+		opacity: 0.75;
+		color: red;
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 600px;
+		height: 400px;
+		-webkit-transition: -webkit-transform 0.5s ease-in-out, opacity 0.5s ease-in-out 0.5s;
+		visibility: hidden;
+		border-radius: 5px;
+	}
+	section.current,section.below,  section.above, section.bottom, section.top {
+		visibility: visible;
+	}
+	section.current {
+		-webkit-transform: translateY(0px) translateZ(00px) rotateX(0deg);
+		opacity: 1;
+	}
+	section.below {
+		-webkit-transform: translateY(115px) translateZ(-200px) rotateX(60deg);
+	}
+	section.above {
+		-webkit-transform: translateY(-115px) translateZ(-200px) rotateX(-60deg);
+	}
+	section.bottom
+	 {
+		-webkit-transform: translateY(130px) translateZ(-225px) rotateX(60deg);
+	}
+	section.top {
+		-webkit-transform: translateY(-130px) translateZ(-225px) rotateX(-60deg);
+	}
+
+	</style>
+
+	<script>
+	window.order = ["current","below","bottom","top","above"]
+		onload = function () {
+			window.sections = document.querySelectorAll(".issue");
+			window.magazine = document.querySelector(".magazine");
+			magazine.addEventListener("webkitTransitionEnd",function (e) {console.log(e)})
+			for (var i=0;i<3;i++) {
+				sections[i].classList.add(order[i])
+			}
+		}
+
+		function up() {
+			var current = order.concat()
+			order.push(order.shift())
+			for (var i=0;i<sections.length;i++) {
+				sections[i].classList.remove(current[i])
+				sections[i].classList.add(order[i])
+			}
+
+		}
+		function down() {
+			var current = order.concat()
+			order.unshift(order.pop())
+			for (var i=0;i<sections.length;i++) {
+				sections[i].classList.remove(current[i])
+				sections[i].classList.add(order[i])
+			}
+		}
+
+		
+	</script>
+
+	</head>
+	<body>
+		<button onclick="up()">up</button>
+		<button onclick="down()">down</button>
+		<section class="magazine">
+			<section class="issue">
+
+				first
+
+
+
+			</section>
+			<section class="issue">
+
+
+				
+second
+
+			</section>
+			<section class="issue">
+
+
+				third
+
+
+			</section>			
+			<section class="issue">
+
+				fourth
+
+
+
+			</section>			
+			<section class="issue">
+
+
+				fifth
+
+
+			</section>
+
+
+		</section>
+
+	</body>
+
+
+</html>

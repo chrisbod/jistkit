@@ -59,9 +59,9 @@
             
           },
           handleTouchStart: function (event) {
+            this.eventChain.length = 0;
             if (event.touches.length==1) {
-                this.started =true;
-                this.eventChain.length = 0;
+                this.started =true;   
                 this.startY = event.touches[0].pageY;
                 this.startX = event.touches[0].pageX;
                 delete this.verticalDistance;
