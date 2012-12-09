@@ -8,6 +8,12 @@ describe("Jistkit", function () {
   it("jistkit should be reported in HTMLElements", function () {
     expect(("jistkit" in element)).toEqual(true);
   });
+  it("jistkit should report as object", function () {
+    expect(typeof element.jistkit).toEqual("object")
+  });
+    it ("omce it is reference element should have its own property ", function () {
+    expect(element.hasOwnProperty("jistkit")).toEqual(true)
+  });
   it("elements should return the same object on each call to their jistkit property ", function () {
     expect(element.jistkit).toEqual(element.jistkit);
   });
@@ -18,8 +24,8 @@ describe("Jistkit", function () {
     element.jistkit.dummyProperty = 1;
     element.jistkit.dispose();
     expect(element.jistkit.dummyProperty).toNotEqual(1);
-    
   });
+
   it("jistkit objects' element property should neither be settable nor deletable", function () {
       //TODO decide if this is really the correct behaviour as it creates a circular reference...
       expect(element.jistkit.hasOwnProperty("element")).toEqual(true);
@@ -40,26 +46,5 @@ describe("Jistkit", function () {
     expect(element.jistkit).toNotEqual(document.createElement("div").jistkit)
   })
 });
-//okay dummy extender tests should be elsewhere (and should be run on EVERY extender) really but they're pretty central to jistkit
 
 
-describe("Jistkit.DummyExtender (using Jistkit.createType)", function () {
-  var element = document.documentElement;
-it("dummy property should now exist in element.jistkit", function () {
-    expect(("dummy" in element.jistkit)).toEqual(true);
-  })
-it("dummy property should be an instance of JistkitDummyExtender", function () {
-    expect(element.jistkit.dummy instanceof window.DummyExtender)
-})
-it ("dummy property should not (any longer) be an instanceof Jistkit",  function () {
-    expect(element.jistkit.dummy instanceof Jistkit).toEqual(false)
-})
-it("dummy property should return same object", function () {
-  var dummy = element.jistkit.dummy;
-  expect(dummy).toEqual(element.jistkit.dummy);
-})
-it("DummyExtender should not be in global namespace", function () {
-  expect(typeof Jistkit_DummyExtender).toEqual("undefined");
-})
-
-})
