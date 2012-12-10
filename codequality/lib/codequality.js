@@ -245,9 +245,56 @@ CodeQuality.prototype = {
         description: "I like my binds and my closures to be indicative of where they come form and that they are Binds or Closures",
         level: -1
     },
-
-
-
+    MULTIPLE_GLOBAL_CONSTRUCTORS: {
+        name: "Multiple global constructors",
+        description: "For non-deployment files it's probably best to keep your global constructors down to one file",
+        tolerance: 1,
+        level: 0
+    },
+    GLOBAL_VARIABLES: {
+        name: "Global variables",
+        description: "Try not to pollute the global namespace with variables that aren't constructors",
+        tolerance: 0,
+        level: 0
+    },
+    GLOBAL_FUNCTIONS: {
+        name: "Global functions",
+        description: "If you're defining a function (not a constructor) at the global level and you name it wrap it in brackets to prevent it's name becoming a global property ",
+        level: 0
+    },
+    CLOSURE_PATTERN: {
+        name: "Closure pattern",
+        description: "As popular as it is using the closure pattern is memory greedy and inefficient",
+        level: 0
+    },
+    PRIVATELY_SCOPED_VARIABLES: {
+        name: "Privately scoped variables",
+        description: "Inefficient and memory hungry, they also make inheritance either impossible or really memory hungry you could just use a '_' prefix to indicate the private nature of any properties",
+        level: 0
+    },
+    PRIVATELY_SCOPED_METHODS: {
+        name: "Privately scoped methods",
+        description: "Inefficient and memory hungry, they also make inheritance either impossible or really memory hungry you could just use a '_' prefix to indicate the private nature of any properties",
+        level: 0
+    },
+    RETURNING_LITERALS: {
+        name: "Returning literals from the closure pattern",
+        description: "Which do you hate the most? The browser, Javascript, other developers or yourself...",
+        level: 0
+    },
+    INTERNAL_METHOD_SWITCHING: {
+        name: "Internal method switching",
+        description: "Okay it's great for performance and makes me feel clever but it's pretty evil nonetheless",
+        level: 0
+    },
+    EXTENDING_NATIVE_OBJECTS: {
+        name: "Extending native objects",
+        description: "If you're not doing a shim you probably should namespace these (if you haven't already). If you are doing a shim are you the only one?"
+    },
+    STRING_DECLARATION_WITH_QUOTES: {
+        name: "string decalration with quotes",
+        description: "I always forget but it's good practice to use single quotes for strings - makes html easier to write too"
+    },
     manifest: null,
     handleEvent: function codeQuality_handleEvent(event) {
         switch (event.type) {
@@ -359,6 +406,7 @@ CodeQuality.prototype = {
 
 
     //Helpers
+
 
     Notification: function CodeQuality_Notification(type,script,object,key,lineNumber) {
         this.type = type;
