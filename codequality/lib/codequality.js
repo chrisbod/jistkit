@@ -48,7 +48,7 @@ CodeQuality.prototype = {
         level: 0
     },
     ANONYMOUS_CLOSURES: {
-        name: "anonymous closures".
+        name: "anonymous closures",
         explanation: "naming nested functions/closures aids debugging as well as make code more self explanatory",
         level: 0
     },
@@ -71,7 +71,7 @@ CodeQuality.prototype = {
         ignoreInherited: true,
         ignoreMarkedPrivate: true,
         level: 0
-    }
+    },
     NUMEROUS_ARGUMENTS: {
         name: "numerous arguments",
         explanation: "methods that take a lot of arguments can be hard to work with",
@@ -102,24 +102,24 @@ CodeQuality.prototype = {
     INCONSISTENT_OVERRIDES: {
         name: "inconsistent overrides",
         explanation: "your types seem to have clashing definitions of the same property",
-        ignoreNullForObjects, true,
+        ignoreNullForObjects: true,
         ignoreNullForPrimitives: true,
         ignoreNullForFunctions: true,
         level: 0
     },
     INCONSISTENT_SIGNATURES: {
-        name "inconsistent method signatures",
+        name: "inconsistent method signatures",
         explanation: "your object's methods seem to take a different number of arguments up their inheritance tree",
         level: 0
     },
     SHARED_REFERENCES: {
         name: "shared references",
-        explanation: "you have pointers to objects in your prototype chain (excluding Elements, windows etc)) - these will be shared down the heirarchy - unless this is the correct behaviour consider using nulls and declaring them explicitly in the constructor/instance methods"
+        explanation: "you have pointers to objects in your prototype chain (excluding Elements, windows etc)) - these will be shared down the heirarchy - unless this is the correct behaviour consider using nulls and declaring them explicitly in the constructor/instance methods",
         level: 0
     },
     ASSIGNMENT_TO_DESCRIPTORS: {
         name: "assignment to value descriptors",
-        explanation: "assignment to properties with non-writable value descriptors set up the chain will fail, use setters and getters "
+        explanation: "assignment to properties with non-writable value descriptors set up the chain will fail, use setters and getters ",
         level: 0
     },
 
@@ -132,7 +132,7 @@ CodeQuality.prototype = {
         ignoreFunc: true,
         ignoreObj: true,
         ignoreElm: true,
-        ignoreIJK: true
+        ignoreIJK: true,
         ignoreAlpha: true,
         level: 0
     },
@@ -145,7 +145,7 @@ CodeQuality.prototype = {
     },
     CONSECUTIVE_VAR_DECLARATIONS: {
         name: "consecutive var statements",
-        explanation: "you don't really need to use multiple vars everywhere you can comma seperate them in groups"
+        explanation: "you don't really need to use multiple vars everywhere you can comma seperate them in groups",
         level: 0,
     },
     NUMEROUS_VAR_DECLARATIONS: {
@@ -155,7 +155,7 @@ CodeQuality.prototype = {
     },
     OVERLONG_METHOD: {
         name: "overlong method",
-        explanation: "overlong methods are prone to bugs, hard to read/understand and probably indicate that a refactor is needed".
+        explanation: "overlong methods are prone to bugs, hard to read/understand and probably indicate that a refactor is needed",
         tolerance: 16,
         ignoreVar: true,
         ignoreSwitch: true,
@@ -217,7 +217,7 @@ CodeQuality.prototype = {
         level: 0
     },
     THROWING_STRINGS: {
-        name "throw strings instead of Errors",
+        name: "throw strings instead of Errors",
         description: "you should probably throw an Error or some sort of Object rather than a string as Errors often provide more info when debugging",
         ignoreStringObjects: true,
         level: 0
@@ -244,7 +244,7 @@ CodeQuality.prototype = {
         name: "Jist: function naming conventions",
         description: "I like my binds and my closures to be indicative of where they come form and that they are Binds or Closures",
         level: -1
-    }
+    },
 
 
 
@@ -276,7 +276,7 @@ CodeQuality.prototype = {
         var resultsFragment = document.createDocumentFragment();
 
         for (var i=0,section;i<this.results.length;i++) {
-            section = this.buildSection(this.scripts[i].name,this.scripts[i].filepath);
+            section = this.buildSection(this.manifest.scripts[i].name,this.manifest.scripts[i].filepath);
             section.querySelector("section").appendChild(this.outputResults(this.results[i]))
             resultsFragment.appendChild(section)
         };
@@ -301,6 +301,7 @@ CodeQuality.prototype = {
             output = document.createElement("section");
         header.appendChild(heading);
         header.appendChild(subheader);
+        section.appendChild(header)
         section.appendChild(output)
         return section;
     })(),
@@ -350,7 +351,11 @@ CodeQuality.prototype = {
     },
     interrogateFunction: function () {
 
-    }
+    },
+    outputResults: function (result) {
+        console.log(result)
+        return document.createElement("div")
+    },
 
 
     //Helpers
