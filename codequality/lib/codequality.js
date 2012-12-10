@@ -23,6 +23,63 @@ function CodeQuality (manifest) {
     this.results = [];
 }
 CodeQuality.prototype = {
+
+    /*
+    
+    types of issue (CONSTANTS)
+
+    levels:
+    0 - count only - all default to count only
+    1 - report
+    2 - warn
+    3 - error
+
+
+
+    */
+    ANONYMOUS_METHODS: {},
+    NUMEROUS_METHODS: {},
+    NUMEROUS_ARGUMENTS: {},
+    CLOSURES: {},
+    NESTED_FUNCTIONS: {},
+
+    DEEP_INHERITANCE_CHAIN: {},
+    UNDECLARED_PROPERTIES: {},
+    INCONSISTENT_OVERRIDES: {},
+    SHARED_REFERENCES: {},
+    ASSIGNMENT_TO_DESCRIPTORS: {},
+
+    SHORT_VARIABLES: {},
+    NUMEROUS_VARIABLES: {},
+    CONSECUTIVE_VAR_DECLARATIONS: {},
+    NUMEROUS_VAR_DECLARATIONS: {},
+
+
+
+    OVERLONG_METHOD: {},
+    OVERLONG_LOOP: {},
+    DEEP_LOOP_NESTING: {},
+    CONSECUTIVE_CONDITIONALS: {},
+
+    LONG_REFERENCE_CHAINS: {},
+
+    CONSOLE_CALLS: {},
+    DEBUGGER_STATEMENT: {},
+
+    DEEP_LOOP_NESTING: {},
+    LARGE_TRY_BLOCKS: {},
+    EMPTY_CATCH_BLOCKS: {},
+    THROWING_STRINGS: {},
+
+
+    CASE_CONVENTIONS: {},
+    PROTOTYPICAL_HELPERTYPES: {},
+
+    JIST_NAMING_CONVENTIONS: {},
+    JIST_INHERTIANCE_CONVENTIONS: {},
+
+
+
     manifest: null,
     handleEvent: function codeQuality_handleEvent(event) {
         switch (event.type) {
@@ -37,7 +94,7 @@ CodeQuality.prototype = {
         var manifest = this.manifest,
             scripts = manifest.scripts;
         for (var i=0;i<scripts.length;i++) {
-            document.writeln('<scr'+'ipt src="'+(manifest.base? manifest.base+'/' : '')+'/'+manifest.scripts[i].file+'"></scr'+'ipt>')
+            document.writeln('<scr'+'ipt src="'+(manifest.base? manifest.base+'/': '')+'/'+manifest.scripts[i].file+'"></scr'+'ipt>')
         }
     },
     check: function codeQuality_check() {
@@ -115,7 +172,9 @@ CodeQuality.prototype = {
     analyzeDescriptor: function (object,key,prototype) {
     var descriptor = Object.getOwnPropertyDescriptor(object,key);
         if (typeof descriptor.value == "function") {
-            if (!descriptor.value.name) console.log(key,"anonymous function")
+            if (!descriptor.value.name) {
+
+            }
         } else if (typeof descriptor.value == "object" && descriptor.value) {
            console.log(descriptor.value.constructor.name in window)
                 
@@ -127,7 +186,7 @@ CodeQuality.prototype = {
 
 }
 
-function CodeQualityNotification(type,object,key,details) {
+function CodeQualityNotification(type,object,key,script) {
     this.type = type;
     this.object = object;
     this.key = key
@@ -136,44 +195,5 @@ function CodeQualityNotification(type,object,key,details) {
 
     /*anonymous functions/methods
     */
-CodeQualityNotification.ANONYMOUS_METHODS = 0;
-CodeQualityNotification.NUMEROUS_METHODS = 2;
-CodeQualityNotification.NUMEROUS_ARGUMENTS = 3;
-CodeQualityNotification.CLOSURES = 5;
-CodeQualityNotification.NESTED_FUNCTIONS = 234234;
 
-CodeQualityNotification.DEEP_INHERITANCE_CHAIN = 1;
-CodeQualityNotification.UNDECLARED_PROPERTIES = 4;
-CodeQualityNotification.INCONSISTENT_OVERRIDES = 6;
-CodeQualityNotification.SHARED_REFERENCES = 7;
-CodeQualityNotification.ASSIGNMENT_TO_DESCRIPTORS = 4;
-
-CodeQualityNotification.SHORT_VARIABLES = 10;
-CodeQualityNotification.NUMEROUS_VARIABLES = 16;
-CodeQualityNotification.CONSECUTIVE_VAR_DECLARATIONS = 18;
-CodeQualityNotification.NUMEROUS_VAR_DECLARATIONS = 18;
-
-
-
-CodeQualityNotification.OVERLONG_METHOD = 9;
-CodeQualityNotification.OVERLONG_LOOP = 9;
-CodeQualityNotification.DEEP_LOOP_NESTING = 8;
-CodeQualityNotification.CONSECUTIVE_CONDITIONALS = 7;
-
-CodeQualityNotification.LONG_REFERENCE_CHAINS = 17;
-
-
-CodeQualityNotification.CONSOLE_CALLS = 13;
-CodeQualityNotification.DEBUGGER_STATEMENT = 14;
-
-CodeQualityNotification.DEEP_LOOP_NESTING = 8;
-CodeQualityNotification.LARGE_TRY_BLOCKS = 3123123;
-CodeQualityNotification.EMPTY_CATCH_BLOCKS = 1232;
-CodeQualityNotification.THROWING_STRINGS = 1231231;
-
-CodeQualityNotification.PROTOTYPICAL_HELPERS = 11;
-CodeQualityNotification.CASE_CONVENTIONS = 12;
-
-CodeQualityNotification.JIST_NAMING_CONVENTIONS = 11;
-CodeQualityNotification.JIST_INHERTIANCE_CONVENTIONS = 11;
 
